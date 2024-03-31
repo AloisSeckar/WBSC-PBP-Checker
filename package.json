@@ -9,6 +9,7 @@
     "@nuxtjs/eslint-config-typescript": "12.1.0",
     "eslint": "8.57.0",
     "node-html-parser": "6.1.13",
-    "nuxt": "3.11.1"
+    "nuxt": "3.11.1",
+    "puppeteer": "22.6.1"
   }
 }
