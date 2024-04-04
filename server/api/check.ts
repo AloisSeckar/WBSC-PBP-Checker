@@ -9,11 +9,14 @@ type GamePlays = {
   [key: string]: { top: GamePlay[], bot: GamePlay[] }
 }
 
+type Winner = 'home' | 'away'
+
 export default defineEventHandler(async (): Promise<PBPCheck> => {
   const browser = await launch()
 
   const problems: string[] = []
 
+  let winner: Winner = 'home'
   let gameTitle = 'UNKNOWN'
   let gameData
   let appData
@@ -43,7 +46,16 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
         homeTeamId = gameData.homeid
         awayTeamId = gameData.awayid
 
-        gameTitle = `#${gameData.gamenumber} - ${gameData.homeioc} vs. ${gameData.awayioc} (${gameData.start})`
+        // elaborate winning team
+        const homePoints = gameData.homeruns
+        const awayPoints = gameData.awayruns
+        if (homePoints === awayPoints) {
+          problems.push(`Game ended with a tie (${homePoints}:${awayPoints})`)
+        }
+        winner = homePoints > awayPoints ? 'home' : 'away'
+
+        // build game title
+        gameTitle = `#${gameData.gamenumber} - ${gameData.homeioc} ${homePoints} vs. ${awayPoints} ${gameData.awayioc} (${gameData.start})`
       } else {
         problems.push('Data object `gameData` not found')
       }
@@ -64,21 +76,21 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
         if (pitchers) {
           if (pitchers.win) {
             // TODO check if valid W
-            const winPitcher = findPitcher(pitchers.win.id, homePitchers, awayPitchers)
+            const winPitcher = findPitcher(pitchers.win.id, winner === 'home' ? homePitchers : awayPitchers)
             console.log(winPitcher?.firstname + ' ' + winPitcher?.lastname)
           } else {
             problems.push('Winning pitcher not set')
           }
           if (pitchers.loss) {
             // TODO check if valid L
-            const lossPitcher = findPitcher(pitchers.loss.id, homePitchers, awayPitchers)
+            const lossPitcher = findPitcher(pitchers.loss.id, winner === 'home' ? awayPitchers : homePitchers)
             console.log(lossPitcher?.firstname + ' ' + lossPitcher?.lastname)
           } else {
             problems.push('Losing pitcher not set')
           }
           if (pitchers.save) {
             // TODO check if valid S
-            const savePitcher = findPitcher(pitchers.save.id, homePitchers, awayPitchers)
+            const savePitcher = findPitcher(pitchers.save.id, winner === 'home' ? homePitchers : awayPitchers)
             console.log(savePitcher?.firstname + ' ' + savePitcher?.lastname)
           } else {
             // TODO check if SAVE necessary
