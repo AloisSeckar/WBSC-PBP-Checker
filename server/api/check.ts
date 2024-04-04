@@ -14,7 +14,8 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
 
   const problems: string[] = []
 
-  let pbpHTMLData = ''
+  let gameTitle = 'UNKNOWN'
+  let gameData
   let appData
   let boxScore
   let pitchers
@@ -26,7 +27,7 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
     const page = await browser.newPage()
     await page.goto('https://stats.baseball.cz/cs/events/2023-extraliga/schedule-and-results/box-score/116387')
 
-    pbpHTMLData = await page.content()
+    const pbpHTMLData = await page.content()
     const pbpPage1 = parse(pbpHTMLData)
     const app = pbpPage1.querySelector('#app')
     const appDataString = app?.attrs['data-page']
@@ -35,22 +36,50 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
     }
 
     if (appData) {
+      let homeTeamId = '0'
+      let awayTeamId = '0'
+      gameData = appData.gameData
+      if (gameData) {
+        homeTeamId = gameData.homeid
+        awayTeamId = gameData.awayid
+
+        gameTitle = `#${gameData.gamenumber} - ${gameData.homeioc} vs. ${gameData.awayioc} (${gameData.start})`
+      } else {
+        problems.push('Data object `gameData` not found')
+      }
       boxScore = appData.boxScore
       if (boxScore) {
+        const homeStats = boxScore[homeTeamId]
+        const homePitchers = homeStats?.['90']
+        if (!homePitchers) {
+          problems.push('Data object for `homePitchers` not found')
+        }
+        const awayStats = boxScore[awayTeamId]
+        const awayPitchers = awayStats?.['90']
+        if (!awayPitchers) {
+          problems.push('Data object for `awayPitchers` not found')
+        }
+
         pitchers = boxScore.pitchers
         if (pitchers) {
           if (pitchers.win) {
             // TODO check if valid W
+            const winPitcher = findPitcher(pitchers.win.id, homePitchers, awayPitchers)
+            console.log(winPitcher?.firstname + ' ' + winPitcher?.lastname)
           } else {
             problems.push('Winning pitcher not set')
           }
           if (pitchers.loss) {
             // TODO check if valid L
+            const lossPitcher = findPitcher(pitchers.loss.id, homePitchers, awayPitchers)
+            console.log(lossPitcher?.firstname + ' ' + lossPitcher?.lastname)
           } else {
             problems.push('Losing pitcher not set')
           }
           if (pitchers.save) {
             // TODO check if valid S
+            const savePitcher = findPitcher(pitchers.save.id, homePitchers, awayPitchers)
+            console.log(savePitcher?.firstname + ' ' + savePitcher?.lastname)
           } else {
             // TODO check if SAVE necessary
           }
@@ -67,13 +96,13 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
         const innings = Object.keys(gamePlays).sort((a, b) => parseInt(a) - parseInt(b))
         innings.forEach((key) => {
           // top of inning
-          gamePlays[key].top?.forEach((play) => {
-            console.log(play.narrative)
+          gamePlays[key].top?.forEach((_play) => {
+            // console.log(play.narrative)
             // TODO check hits + forced outs (singles/doubles/triples)
           })
           // bottom of inning
-          gamePlays[key].bot?.forEach((play) => {
-            console.log(play.narrative)
+          gamePlays[key].bot?.forEach((_play) => {
+            // console.log(play.narrative)
             // TODO check hits + forced outs (singles/doubles/triples)
           })
         })
@@ -97,7 +126,7 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
     date: new Date(),
     result: 'OK',
     games: {
-      game: '2023-03-31 - #2 - ARR vs. HLU', // TODO get from game data...
+      game: gameTitle,
       result: problems.length === 0 ? 'OK' : 'ERR',
       problems
     }
