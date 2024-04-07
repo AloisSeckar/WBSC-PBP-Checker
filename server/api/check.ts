@@ -11,11 +11,14 @@ type GamePlays = {
 
 type Winner = 'home' | 'away'
 
+type Variant = 'baseball' | 'softball'
+
 export default defineEventHandler(async (): Promise<PBPCheck> => {
   const browser = await launch()
 
   const problems: string[] = []
 
+  let variant: Variant = 'baseball'
   let winner: Winner = 'home'
   let gameTitle = 'UNKNOWN'
   let gameData
@@ -39,12 +42,23 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
     }
 
     if (appData) {
+      let innings = 0
       let homeTeamId = '0'
       let awayTeamId = '0'
+
+      const tournamentInfo = appData.tournamentInfo
+      if (tournamentInfo) {
+        variant = tournamentInfo.innings === 9 ? 'baseball' : 'softball'
+      } else {
+        problems.push('Data object `tournamentInfo` not found')
+      }
+
       gameData = appData.gameData
       if (gameData) {
         homeTeamId = gameData.homeid
         awayTeamId = gameData.awayid
+
+        innings = gameData.innings
 
         // elaborate winning team
         const homePoints = gameData.homeruns
@@ -71,26 +85,44 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
         if (!awayPitchers) {
           problems.push('Data object for `awayPitchers` not found')
         }
+        const pitcherRecords = [...homePitchers, ...awayPitchers]
 
         pitchers = boxScore.pitchers
         if (pitchers) {
           if (pitchers.win) {
-            // TODO check if valid W
-            const winPitcher = findPitcher(pitchers.win.id, winner === 'home' ? homePitchers : awayPitchers)
+            const winPitcher = findPitcher(pitchers.win.id, pitcherRecords)
+            // must be correct team
+            if (!checkCorrectTeam(winPitcher, winner === 'home' ? homeTeamId : awayTeamId)) {
+              problems.push('Winning pitcher is from losing team')
+            }
+            // starter must have enough innings
+            if (winPitcher.sub === 0) {
+              if (!checkEnoughInnings(winPitcher, innings, variant)) {
+                problems.push('Starting pitcher doesn\'t have enough IP to get the win')
+              }
+            }
             console.log(winPitcher?.firstname + ' ' + winPitcher?.lastname)
           } else {
             problems.push('Winning pitcher not set')
           }
           if (pitchers.loss) {
-            // TODO check if valid L
-            const lossPitcher = findPitcher(pitchers.loss.id, winner === 'home' ? awayPitchers : homePitchers)
+            const lossPitcher = findPitcher(pitchers.loss.id, pitcherRecords)
+            // must be correct team
+            if (!checkCorrectTeam(lossPitcher, winner === 'home' ? awayTeamId : homeTeamId)) {
+              problems.push('Winning pitcher is from losing team')
+            }
             console.log(lossPitcher?.firstname + ' ' + lossPitcher?.lastname)
           } else {
             problems.push('Losing pitcher not set')
           }
           if (pitchers.save) {
             // TODO check if valid S
-            const savePitcher = findPitcher(pitchers.save.id, winner === 'home' ? homePitchers : awayPitchers)
+            const savePitcher = findPitcher(pitchers.save.id, pitcherRecords)
+            // must be correct team
+            if (!checkCorrectTeam(savePitcher, winner === 'home' ? homeTeamId : awayTeamId)) {
+              problems.push('Winning pitcher is from losing team')
+            }
+            // TODO rules must be fullfiled
             console.log(savePitcher?.firstname + ' ' + savePitcher?.lastname)
           } else {
             // TODO check if SAVE necessary
