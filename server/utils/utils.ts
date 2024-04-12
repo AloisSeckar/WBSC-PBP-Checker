@@ -1,12 +1,12 @@
-export function findPitcher (playerId: string, pitchers: any) {
-  return pitchers?.find((p: any) => p.playerid === playerId)
+export function findPitcher (playerId: number, pitchers: WBSCPlayerStats[]) {
+  return pitchers?.find((p: WBSCPlayerStats) => p.playerid === playerId)
 }
 
-export function checkCorrectTeam (pitcher: any, teamId: number) {
+export function checkCorrectTeam (pitcher: WBSCPlayerStats, teamId: number) {
   return pitcher.teamid === teamId
 }
 
-export function checkEnoughInnings (pitcher: any, innings: number, variant: string) {
+export function checkEnoughInnings (pitcher: WBSCPlayerStats, innings: number, variant: string) {
   const ip = pitcher.pitch_ip
 
   if (variant === 'softball') {

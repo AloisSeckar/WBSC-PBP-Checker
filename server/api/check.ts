@@ -1,6 +1,6 @@
 import { parse } from 'node-html-parser'
 import { launch } from 'puppeteer'
-import type { PBPCheck } from '../utils/types'
+import { WBSCStats } from '../utils/types'
 
 type GamePlay = {
   narrative: string
@@ -38,13 +38,13 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
     const app = pbpPage1.querySelector('#app')
     const appDataString = app?.attrs['data-page']
     if (appDataString) {
-      appData = JSON.parse(appDataString).props.viewData.original
+      appData = JSON.parse(appDataString).props.viewData.original as WBSCAppData
     }
 
     if (appData) {
       let innings = 0
-      let homeTeamId = '0'
-      let awayTeamId = '0'
+      let homeTeamId = 0
+      let awayTeamId = 0
 
       const tournamentInfo = appData.tournamentInfo
       if (tournamentInfo) {
@@ -75,12 +75,12 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
       }
       boxScore = appData.boxScore
       if (boxScore) {
-        const homeStats = boxScore[homeTeamId]
+        const homeStats = boxScore[homeTeamId] as WBSCStats
         const homePitchers = homeStats?.['90']
         if (!homePitchers) {
           problems.push('Data object for `homePitchers` not found')
         }
-        const awayStats = boxScore[awayTeamId]
+        const awayStats = boxScore[awayTeamId] as WBSCStats
         const awayPitchers = awayStats?.['90']
         if (!awayPitchers) {
           problems.push('Data object for `awayPitchers` not found')
@@ -90,7 +90,7 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
         pitchers = boxScore.pitchers
         if (pitchers) {
           if (pitchers.win) {
-            const winPitcher = findPitcher(pitchers.win.id, pitcherRecords)
+            const winPitcher = findPitcher(pitchers.win.id, pitcherRecords)!
             // must be correct team
             if (!checkCorrectTeam(winPitcher, winner === 'home' ? homeTeamId : awayTeamId)) {
               problems.push('Winning pitcher is from losing team')
@@ -106,7 +106,7 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
             problems.push('Winning pitcher not set')
           }
           if (pitchers.loss) {
-            const lossPitcher = findPitcher(pitchers.loss.id, pitcherRecords)
+            const lossPitcher = findPitcher(pitchers.loss.id, pitcherRecords)!
             // must be correct team
             if (!checkCorrectTeam(lossPitcher, winner === 'home' ? awayTeamId : homeTeamId)) {
               problems.push('Winning pitcher is from losing team')
@@ -117,7 +117,7 @@ export default defineEventHandler(async (): Promise<PBPCheck> => {
           }
           if (pitchers.save) {
             // TODO check if valid S
-            const savePitcher = findPitcher(pitchers.save.id, pitcherRecords)
+            const savePitcher = findPitcher(pitchers.save.id, pitcherRecords)!
             // must be correct team
             if (!checkCorrectTeam(savePitcher, winner === 'home' ? homeTeamId : awayTeamId)) {
               problems.push('Winning pitcher is from losing team')
