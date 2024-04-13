@@ -11,7 +11,7 @@ export type PBPGameCheck = {
 export type PBPCheck = {
     date: Date,
     result: Result,
-    games: PBPGameCheck
+    games: PBPGameCheck[]
 }
 
 // types derived from WBSC data object
