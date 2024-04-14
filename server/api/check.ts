@@ -11,8 +11,6 @@ type GamePlays = {
 
 type Winner = 'home' | 'away'
 
-type Variant = 'baseball' | 'softball'
-
 export default defineEventHandler(async (): Promise<PBPCheck> => {
   const games: PBPGameCheck[] = []
 

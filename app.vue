@@ -17,7 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import type { PBPCheck } from './server/utils/types'
-
-const { data: pbpCheckData } = await useFetch<PBPCheck>('/api/check')
+// import type { PBPCheck } from './server/utils/types'
+//
+// const { data: pbpCheckData } = await useFetch<PBPCheck>('/api/check')
+const pbpCheckData = { temp: 'disabled' }
 </script>

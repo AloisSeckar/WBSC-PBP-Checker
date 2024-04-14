@@ -1,5 +1,7 @@
 // custom types for PBP checker
 
+export type Variant = 'baseball' | 'softball'
+
 export type Result = 'OK' | 'ERR'
 
 export type PBPGameCheck = {
