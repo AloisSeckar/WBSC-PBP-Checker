@@ -1,18 +1,24 @@
 // custom types for PBP checker
 
-export type Variant = 'baseball' | 'softball'
+export type PBPVariant = 'baseball' | 'softball'
 
-export type Result = 'OK' | 'ERR'
+export type PBPWinner = 'home' | 'away'
+
+export type PBPResult = 'OK' | 'ERR'
+
+export type PBPGameCheckRequest = {
+    gameLinks: string[]
+}
 
 export type PBPGameCheck = {
     game: string,
-    result: Result,
+    result: PBPResult,
     problems: string[]
 }
 
 export type PBPCheck = {
     date: Date,
-    result: Result,
+    result: PBPResult,
     games: PBPGameCheck[]
 }
 
@@ -73,13 +79,24 @@ export type WBSCBoxScore = {
     pitchers: WBSCPitchers,
 }
 
+export type WBSCGamePlay = {
+    narrative: string
+}
+
 export type WBSCGamePlays = {
-    all: any // TODO
+    [key: number]: {
+        top: WBSCGamePlay[],
+        bot: WBSCGamePlay[]
+    }
+}
+
+export type WBSCAllGamePlays = {
+    all: WBSCGamePlays
 }
 
 export type WBSCAppData = {
     tournamentInfo: WBSCTournamentInfo,
     gameData: WBSCGameData,
     boxScore: WBSCBoxScore,
-    gamePlays: WBSCGamePlays
+    gamePlays: WBSCAllGamePlays
 }

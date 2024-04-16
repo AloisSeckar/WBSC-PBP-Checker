@@ -1,19 +1,9 @@
 import { parse } from 'node-html-parser'
 import { launch } from 'puppeteer'
-import { PBPGameCheck, WBSCStats } from '../utils/types'
-
-type GamePlay = {
-  narrative: string
-}
-type GamePlays = {
-  [key: string]: { top: GamePlay[], bot: GamePlay[] }
-}
-
-type Winner = 'home' | 'away'
 
 export default defineEventHandler(async (event): Promise<PBPCheck> => {
-  const body = await readBody(event)
-  const gameLinks: string[] = body?.gameLinks
+  const body = await readBody(event) as PBPGameCheckRequest
+  const gameLinks = body?.gameLinks
 
   const games: PBPGameCheck[] = []
 
@@ -21,14 +11,14 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
   for (const gameLink of gameLinks) {
     const problems: string[] = []
 
-    let variant: Variant = 'baseball'
-    let winner: Winner = 'home'
+    let variant: PBPVariant = 'baseball'
+    let winner: PBPWinner = 'home'
     let gameTitle = 'UNKNOWN'
     let gameData
     let appData
     let boxScore
     let pitchers
-    let gamePlays: GamePlays
+    let gamePlays: WBSCGamePlays
     try {
       // the page is client-generated => it requires headless browser to render it
 
@@ -141,7 +131,7 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
         gamePlays = appData.gamePlays.all
         if (gamePlays) {
           // cycle through plays
-          const innings = Object.keys(gamePlays).sort((a, b) => parseInt(a) - parseInt(b))
+          const innings = Object.keys(gamePlays).map(p => parseInt(p)).sort((a, b) => a - b)
           innings.forEach((key) => {
             // top of inning
             gamePlays[key].top?.forEach((_play) => {
