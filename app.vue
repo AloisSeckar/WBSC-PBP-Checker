@@ -17,8 +17,13 @@
 </template>
 
 <script setup lang="ts">
-// import type { PBPCheck } from './server/utils/types'
-//
-// const { data: pbpCheckData } = await useFetch<PBPCheck>('/api/check')
-const pbpCheckData = { temp: 'disabled' }
+import type { PBPCheck } from './server/utils/types'
+
+// TODO connect to real game link input
+const { data: pbpCheckData } = await useFetch<PBPCheck>('/api/check', {
+  method: 'POST',
+  body: {
+    gameLinks: ['https://stats.baseball.cz/cs/events/2023-extraliga/schedule-and-results/box-score/116387']
+  }
+})
 </script>
