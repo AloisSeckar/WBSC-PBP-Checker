@@ -6,13 +6,16 @@ export default defineEventHandler(async (event): Promise<string[]> => {
   const browser = await launch()
 
   const query = getQuery(event)
-  if (query.variant === 'softball') {
-    const allCompetitions = [LINK_ELM, LINK_ELZ, LINK_ELJI, LINK_ELJY]
-    for (const competition of allCompetitions) {
+
+  const variant = query.variant as string
+  const league = query.league as string
+
+  if (variant === 'softball') {
+    const targetCompetitions = league ? [getLinkForLeague(league)] : LINKS_SOFTBALL
+    for (const competition of targetCompetitions) {
       const leaguePage = await browser.newPage()
       await leaguePage.goto(competition)
       const softballGameLinks = await leaguePage.$$eval('span.hidden-xs > a', el => el.filter(x => x.getAttribute('href')?.includes('do=matchplay')).map(x => x.getAttribute('href')))
-      console.log(softballGameLinks)
       for (const link of softballGameLinks) {
         if (link) {
           const gamePage = await browser.newPage()
@@ -22,8 +25,8 @@ export default defineEventHandler(async (event): Promise<string[]> => {
       }
     }
   } else {
-    const allCompetitions = [LINK_B_EXL, LINK_B_LIG, LINK_B_U23, LINK_B_U18]
-    for (const competition of allCompetitions) {
+    const targetCompetitions = league ? [getLinkForLeague(league)] : LINKS_BASEBALL
+    for (const competition of targetCompetitions) {
       const leaguePage = await browser.newPage()
       await leaguePage.goto(competition)
       const baseballGameDetails = await leaguePage.$$eval('td.detail > a', el => el.filter(x => x.getAttribute('href')?.startsWith('/soutez-')).map(x => x.getAttribute('href')))
