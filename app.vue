@@ -4,9 +4,17 @@
     <div>
       Automated crawler for finding common scoring mistakes in Ballclubz play-by-play
     </div>
+    <h2>Games to be checked</h2>
+    <div>
+      <textarea id="games" v-model="gamesText" :rows="10" />
+    </div>
     <div>
       The website is powered by <a href="https://nuxt.com/">Nuxt</a>
     </div>
+    <h2>Check result</h2>
+    <button @click="check">
+      Check games
+    </button>
     <div>
       <br>Raw test data <pre>{{ pbpCheckData }}</pre>
     </div>
@@ -19,11 +27,18 @@
 <script setup lang="ts">
 import type { PBPCheck } from './server/utils/types'
 
-// TODO connect to real game link input
-const { data: pbpCheckData } = await useFetch<PBPCheck>('/api/check', {
-  method: 'POST',
-  body: {
-    gameLinks: ['https://stats.baseball.cz/cs/events/2023-extraliga/schedule-and-results/box-score/116387']
-  }
-})
+const gamesText = ref('')
+const gamesArray = computed(() => gamesText.value.split('\n'))
+
+const pbpCheckData = ref({})
+async function check () {
+  console.debug(gamesArray.value)
+  const data = await $fetch<PBPCheck>('/api/check', {
+    method: 'POST',
+    body: {
+      gameLinks: gamesArray.value
+    }
+  })
+  pbpCheckData.value = data
+}
 </script>
