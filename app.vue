@@ -6,15 +6,15 @@
     </div>
     <h2>Games to be checked</h2>
     <div>
-      <textarea id="games" v-model="gamesText" :rows="10" />
+      <UTextarea id="games" v-model="gamesText" :rows="10" />
     </div>
     <div>
       The website is powered by <a href="https://nuxt.com/">Nuxt</a>
     </div>
     <h2>Check result</h2>
-    <button @click="check">
+    <UButton @click="check">
       Check games
-    </button>
+    </UButton>
     <div>
       <br>Raw test data <pre>{{ pbpCheckData }}</pre>
     </div>
