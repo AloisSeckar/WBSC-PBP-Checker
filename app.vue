@@ -1,26 +1,39 @@
 <template>
-  <div>
-    <h1>WBSC-PBP-Checker</h1>
-    <div>
+  <div class="p-4">
+    <h1 class="mb-4 text-3xl font-bold">
+      WBSC-PBP-Checker
+    </h1>
+    <div class="mb-2">
       Automated crawler for finding common scoring mistakes in Ballclubz play-by-play
     </div>
-    <h2>Games to be checked</h2>
-    <div>
+    <h2 class="mb-4 text-2xl font-bold">
+      Games to be checked
+    </h2>
+    <div class="mb-2">
       <UTextarea id="games" v-model="gamesText" :rows="10" />
     </div>
-    <div>
-      The website is powered by <a href="https://nuxt.com/">Nuxt</a>
-    </div>
-    <h2>Check result</h2>
+    <h2 class="mb-4 text-2xl font-bold">
+      Check result
+    </h2>
     <UButton @click="check">
       Check games
     </UButton>
-    <div>
+    <div class="mb-2">
       <br>Raw test data <pre>{{ pbpCheckData }}</pre>
     </div>
-    <div>
-      Visit <a href="https://github.com/AloisSeckar/WBSC-PBP-Checker">https://github.com/AloisSeckar/WBSC-PBP-Checker</a> for more info and contact
-    </div>
+    <footer>
+      <hr>
+      <div>
+        Visit
+        <a href="https://github.com/AloisSeckar/WBSC-PBP-Checker" class="text-blue-600 hover:text-blue-400">
+          https://github.com/AloisSeckar/WBSC-PBP-Checker
+        </a>
+        for more info and contact
+      </div>
+      <div>
+        The website is powered by <a href="https://nuxt.com/" class="text-blue-600 hover:text-blue-400">Nuxt</a>
+      </div>
+    </footer>
   </div>
 </template>
 
