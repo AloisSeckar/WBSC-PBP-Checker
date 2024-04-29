@@ -89,6 +89,10 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
               if (!checkCorrectTeam(winPitcher, winner === 'home' ? homeTeamId : awayTeamId)) {
                 problems.push('Winning pitcher is from losing team')
               }
+              // must have at least 0.1 IP
+              if (winPitcher.pitch_ip === '0.0') {
+                problems.push('Winning pitcher doesn\'t have any IP')
+              }
               // starter must have enough innings
               if (winPitcher.sub === 0) {
                 if (!checkEnoughInnings(winPitcher, innings, variant)) {
@@ -105,6 +109,10 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
               if (!checkCorrectTeam(lossPitcher, winner === 'home' ? awayTeamId : homeTeamId)) {
                 problems.push('Winning pitcher is from losing team')
               }
+              // must have at least 0.1 IP
+              if (lossPitcher.pitch_ip === '0.0') {
+                problems.push('Losing pitcher doesn\'t have any IP')
+              }
               console.log(lossPitcher?.firstname + ' ' + lossPitcher?.lastname)
             } else {
               problems.push('Losing pitcher not set')
@@ -115,6 +123,10 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
               // must be correct team
               if (!checkCorrectTeam(savePitcher, winner === 'home' ? homeTeamId : awayTeamId)) {
                 problems.push('Winning pitcher is from losing team')
+              }
+              // must have at least 0.1 IP
+              if (savePitcher.pitch_ip === '0.0') {
+                problems.push('Save pitcher doesn\'t have any IP')
               }
               // TODO rules must be fullfiled
               console.log(savePitcher?.firstname + ' ' + savePitcher?.lastname)
