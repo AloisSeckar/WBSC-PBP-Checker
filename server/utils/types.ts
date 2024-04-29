@@ -11,6 +11,7 @@ export type PBPGameCheckRequest = {
 }
 
 export type PBPGameCheck = {
+  link: string
   game: string
   result: PBPResult
   problems: string[]

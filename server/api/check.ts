@@ -178,6 +178,7 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
     }
 
     games.push({
+      link: gameLink,
       game: gameTitle,
       result: problems.length === 0 ? 'OK' : 'ERR',
       problems,
