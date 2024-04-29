@@ -23,6 +23,14 @@ export type PBPCheck = {
   games: PBPGameCheck[]
 }
 
+export type PBPGameAnalysis = {
+  variant: 'baseball' | 'softball'
+  homeTeamId: number
+  awayTeamId: number
+  innings: number
+  winner: 'home' | 'away'
+}
+
 export type PBPPitcherAnalysis = {
   id: number
   pbpName: string

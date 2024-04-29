@@ -11,13 +11,9 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
   for (const gameLink of gameLinks) {
     const problems: string[] = []
 
-    let variant: PBPVariant = 'baseball'
-    let winner: PBPWinner = 'home'
     let gameTitle = 'UNKNOWN'
     let gameData
     let appData
-    let boxScore
-    let pitchers
     let gamePlays: WBSCGamePlays
     try {
       // the page is client-generated => it requires headless browser to render it
@@ -39,6 +35,9 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
         let innings = 0
         let homeTeamId = 0
         let awayTeamId = 0
+
+        let variant: PBPVariant = 'baseball'
+        let winner: PBPWinner = 'home'
 
         const tournamentInfo = appData.tournamentInfo
         if (tournamentInfo) {
@@ -68,88 +67,23 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
           problems.push('Data object `gameData` not found')
         }
 
-        const homePitchers: WBSCPlayerStats[] = []
-        const awayPitchers: WBSCPlayerStats[] = []
-        boxScore = appData.boxScore
-        if (boxScore) {
-          const homeStats = boxScore[homeTeamId] as WBSCStats
-          homePitchers.push(...homeStats['90'])
-          if (!homePitchers) {
-            problems.push('Data object for `homePitchers` not found')
-          }
-          const awayStats = boxScore[awayTeamId] as WBSCStats
-          awayPitchers.push(...awayStats['90'])
-          if (!awayPitchers) {
-            problems.push('Data object for `awayPitchers` not found')
-          }
-          const pitcherRecords = [...homePitchers, ...awayPitchers]
-
-          pitchers = boxScore.pitchers
-          if (pitchers) {
-            if (pitchers.win) {
-              const winPitcher = findPitcher(pitchers.win.id, pitcherRecords)!
-              // must be correct team
-              if (!checkCorrectTeam(winPitcher, winner === 'home' ? homeTeamId : awayTeamId)) {
-                problems.push('Winning pitcher is from losing team')
-              }
-              // must have at least 0.1 IP
-              if (winPitcher.pitch_ip === '0.0') {
-                problems.push('Winning pitcher doesn\'t have any IP')
-              }
-              // starter must have enough innings
-              if (winPitcher.sub === 0) {
-                if (!checkEnoughInnings(winPitcher, innings, variant)) {
-                  problems.push('Starting pitcher doesn\'t have enough IP to get the win')
-                }
-              }
-              console.log(winPitcher?.firstname + ' ' + winPitcher?.lastname)
-            } else {
-              problems.push('Winning pitcher not set')
-            }
-            if (pitchers.loss) {
-              const lossPitcher = findPitcher(pitchers.loss.id, pitcherRecords)!
-              // must be correct team
-              if (!checkCorrectTeam(lossPitcher, winner === 'home' ? awayTeamId : homeTeamId)) {
-                problems.push('Winning pitcher is from losing team')
-              }
-              // must have at least 0.1 IP
-              if (lossPitcher.pitch_ip === '0.0') {
-                problems.push('Losing pitcher doesn\'t have any IP')
-              }
-              console.log(lossPitcher?.firstname + ' ' + lossPitcher?.lastname)
-            } else {
-              problems.push('Losing pitcher not set')
-            }
-            if (pitchers.save) {
-              // TODO check if valid S
-              const savePitcher = findPitcher(pitchers.save.id, pitcherRecords)!
-              // must be correct team
-              if (!checkCorrectTeam(savePitcher, winner === 'home' ? homeTeamId : awayTeamId)) {
-                problems.push('Winning pitcher is from losing team')
-              }
-              // must have at least 0.1 IP
-              if (savePitcher.pitch_ip === '0.0') {
-                problems.push('Save pitcher doesn\'t have any IP')
-              }
-              // TODO rules must be fullfiled
-              console.log(savePitcher?.firstname + ' ' + savePitcher?.lastname)
-            } else {
-              // TODO check if SAVE necessary
-            }
-          } else {
-            problems.push('Data object `pitchers` not found')
-          }
-        } else {
-          problems.push('Data object `boxScore` not found')
+        const gameAnalysis: PBPGameAnalysis = {
+          variant,
+          homeTeamId,
+          awayTeamId,
+          innings,
+          winner,
         }
 
+        // analyze pitching
+        const pitchingProblems = analyzePitching(gameAnalysis, appData)
+        if (pitchingProblems.length > 0) {
+          problems.push(...pitchingProblems)
+        }
+
+        // analyze batting / fielding
         gamePlays = appData.gamePlays.all
         if (gamePlays) {
-          const pitchingProblems = analyzePitching(gamePlays, pitchers!, homePitchers, awayPitchers)
-          if (pitchingProblems.length > 0) {
-            problems.push(...pitchingProblems)
-          }
-
           // cycle through plays
           const innings = Object.keys(gamePlays).map(p => parseInt(p))
           innings.forEach((key) => {
