@@ -1,12 +1,13 @@
 {
   "private": true,
   "scripts": {
-    "build": "nuxt build",
+    "eslint": "eslint .",
     "dev": "nuxt dev",
+    "build": "pnpm run eslint && nuxt build",
     "start": "nuxt preview"
   },
   "devDependencies": {
-    "@nuxtjs/eslint-config-typescript": "12.1.0",
+    "@nuxt/eslint": "0.3.10",
     "@nuxt/ui": "2.15.2",
     "eslint": "8.57.0",
     "node-html-parser": "6.1.13",

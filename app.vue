@@ -44,13 +44,13 @@ const gamesText = ref('')
 const gamesArray = computed(() => gamesText.value.split('\n'))
 
 const pbpCheckData = ref({})
-async function check () {
+async function check() {
   console.debug(gamesArray.value)
   const data = await $fetch<PBPCheck>('/api/check', {
     method: 'POST',
     body: {
-      gameLinks: gamesArray.value
-    }
+      gameLinks: gamesArray.value,
+    },
   })
   pbpCheckData.value = data
 }

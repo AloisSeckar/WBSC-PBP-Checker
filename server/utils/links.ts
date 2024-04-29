@@ -16,7 +16,7 @@ export const LINKS_BASEBALL = [LINK_B_EXL, LINK_B_LIG, LINK_B_U23, LINK_B_U18]
 
 // translate league name to link
 
-export function getLinkForLeague (league: string) {
+export function getLinkForLeague(league: string) {
   switch (league) {
     case 'ELM':
       return LINK_S_ELM

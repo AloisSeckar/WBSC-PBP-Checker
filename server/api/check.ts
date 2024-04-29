@@ -160,7 +160,7 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
     games.push({
       game: gameTitle,
       result: problems.length === 0 ? 'OK' : 'ERR',
-      problems
+      problems,
     })
   }
   browser.close()
@@ -169,6 +169,6 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
   return {
     date: new Date(),
     result: 'OK',
-    games
+    games,
   }
 })

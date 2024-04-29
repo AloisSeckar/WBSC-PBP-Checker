@@ -1,12 +1,12 @@
-export function findPitcher (playerId: number, pitchers: WBSCPlayerStats[]) {
+export function findPitcher(playerId: number, pitchers: WBSCPlayerStats[]) {
   return pitchers?.find((p: WBSCPlayerStats) => p.playerid === playerId)
 }
 
-export function checkCorrectTeam (pitcher: WBSCPlayerStats, teamId: number) {
+export function checkCorrectTeam(pitcher: WBSCPlayerStats, teamId: number) {
   return pitcher.teamid === teamId
 }
 
-export function checkEnoughInnings (pitcher: WBSCPlayerStats, innings: number, variant: string) {
+export function checkEnoughInnings(pitcher: WBSCPlayerStats, innings: number, variant: string) {
   const ip = pitcher.pitch_ip
 
   if (variant === 'softball') {
@@ -20,7 +20,6 @@ export function checkEnoughInnings (pitcher: WBSCPlayerStats, innings: number, v
         return ip >= '4.0'
     }
   } else {
-    // eslint-disable-next-line no-lonely-if
     if (innings < 6) {
       return ip >= '4.0'
     } else {
