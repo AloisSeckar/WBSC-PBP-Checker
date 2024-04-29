@@ -6,7 +6,7 @@ export function checkCorrectTeam(pitcher: WBSCPlayerStats, teamId: number) {
   return pitcher.teamid === teamId
 }
 
-export function checkEnoughInnings(pitcher: WBSCPlayerStats, innings: number, variant: string) {
+export function checkEnoughInnings(pitcher: { pitch_ip: string }, innings: number, variant: string) {
   const ip = pitcher.pitch_ip
 
   if (variant === 'softball') {

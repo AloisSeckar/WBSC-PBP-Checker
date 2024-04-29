@@ -35,7 +35,7 @@ export type PBPPitcherAnalysis = {
   id: number
   pbpName: string
   fullName: string
-  ip?: number
+  pitch_ip: string
   starting?: boolean
   win?: boolean
   loss?: boolean

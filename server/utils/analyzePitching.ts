@@ -44,10 +44,8 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
           pitchingProblems.push('Winning pitcher doesn\'t have any IP')
         }
         // starter must have enough innings
-        if (winPitcher.sub === 0) {
-          if (!checkEnoughInnings(winPitcher, innings, variant)) {
-            pitchingProblems.push('Starting pitcher doesn\'t have enough IP to get the win')
-          }
+        if (winPitcher.sub === 0 && !checkEnoughInnings(winPitcher, innings, variant)) {
+          pitchingProblems.push('Starting pitcher doesn\'t have enough IP to get the win')
         }
         console.log(winPitcher?.firstname + ' ' + winPitcher?.lastname)
       } else {
@@ -92,18 +90,12 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
 
   // export function analyzePitching(gamePlays: WBSCGamePlays, pitchers: WBSCPitchers, homePitchersData: WBSCPlayerStats[], awayPitchersData: WBSCPlayerStats[]): string[] {
   init()
-  homePitchersData.forEach(p => homePitchers.push({
-    id: p.playerid,
-    pbpName: `#${p.uniform} ${p.lastname}`,
-    fullName: `${p.lastname} ${p.firstname}`,
-  }))
-  currentHomePitcher = homePitchers.at(0)
-  awayPitchersData.forEach(p => awayPitchers.push({
-    id: p.playerid,
-    pbpName: `#${p.uniform} ${p.lastname}`,
-    fullName: `${p.lastname} ${p.firstname}`,
-  }))
-  currentAwayPitcher = awayPitchers.at(0)
+  homePitchersData.forEach(p => homePitchers.push(toPBPPitcherAnalysis(p)))
+  currentHomePitcher = homePitchers.at(0)!
+  currentHomePitcher.starting = true
+  awayPitchersData.forEach(p => awayPitchers.push(toPBPPitcherAnalysis(p)))
+  currentAwayPitcher = awayPitchers.at(0)!
+  currentAwayPitcher.starting = true
 
   const gamePlays = appData.gamePlays.all
   for (const inn in gamePlays) {
@@ -115,6 +107,7 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
         if (awayPoints > homePoints && !awayTeamIsAhead) {
           awayTakesLead()
           console.log('AWAY takes the lead', homePoints, awayPoints)
+          console.log('Pitchers', currentHomePitcher?.pbpName, currentAwayPitcher?.pbpName)
         } else if (awayPoints === homePoints && homeTeamIsAhead) {
           gameTied()
           console.log('AWAY tied the game', homePoints, awayPoints)
@@ -134,6 +127,7 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
         if (homePoints > awayPoints && !homeTeamIsAhead) {
           homeTakesLead()
           console.log('HOME takes the lead', homePoints, awayPoints)
+          console.log('Pitchers', currentHomePitcher?.pbpName, currentAwayPitcher?.pbpName)
         } else if (homePoints === awayPoints && awayTeamIsAhead) {
           gameTied()
           console.log('HOME tied the game', homePoints, awayPoints)
@@ -159,8 +153,12 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
 
   const correctWin = winningTeamPitchers.find(p => p.win)
   if (correctWin?.id !== pitchers.win?.id) {
-    // TODO
-    pitchingProblems.push(`Winning pitcher should be ${correctWin?.fullName} (${pitchers.win?.fullName} was scored)`)
+    if (correctWin?.starting && !checkEnoughInnings(correctWin, innings, variant)) {
+      // TODO can we verify it is the best choice?
+      console.log('Starting pitcher has not enough IP => someone else was correctly chosen by the scorer')
+    } else {
+      pitchingProblems.push(`Winning pitcher should be ${correctWin?.fullName} (${pitchers.win?.fullName} was scored)`)
+    }
   }
   const correctLoss = losingTeamPitchers.find(p => p.loss)
   if (correctLoss?.id !== pitchers.loss?.id) {
@@ -171,8 +169,7 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
 }
 
 function homeTakesLead() {
-  homePitchers.forEach(p => p.win = false)
-  awayPitchers.forEach(p => p.loss = false)
+  clearWL()
   currentAwayPitcher!.loss = true
   currentHomePitcher!.win = true
   homeTeamIsAhead = true
@@ -180,17 +177,24 @@ function homeTakesLead() {
 }
 
 function awayTakesLead() {
-  homePitchers.forEach(p => p.win = false)
-  awayPitchers.forEach(p => p.loss = false)
+  clearWL()
   currentAwayPitcher!.win = true
   currentHomePitcher!.loss = true
   awayTeamIsAhead = true
   homeTeamIsAhead = false
 }
 
+function clearWL() {
+  homePitchers.forEach((p) => {
+    p.win = p.loss = false
+  })
+  awayPitchers.forEach((p) => {
+    p.win = p.loss = false
+  })
+}
+
 function gameTied() {
-  homePitchers.forEach(p => p.win = false)
-  awayPitchers.forEach(p => p.loss = false)
+  clearWL()
   homeTeamIsAhead = false
   awayTeamIsAhead = false
 }
@@ -213,11 +217,21 @@ function changePitcher(play: string, home: boolean) {
   }
 }
 
+function toPBPPitcherAnalysis(stats: WBSCPlayerStats): PBPPitcherAnalysis {
+  return {
+    id: stats.playerid,
+    pbpName: `#${stats.uniform} ${stats.lastname}`,
+    fullName: `${stats.lastname} ${stats.firstname}`,
+    pitch_ip: stats.pitch_ip,
+  }
+}
+
 function init() {
   homePitchers.length = 0
   currentHomePitcher = undefined
   homePoints = 0
   homeTeamIsAhead = false
+
   awayPitchers.length = 0
   currentAwayPitcher = undefined
   awayPoints = 0
