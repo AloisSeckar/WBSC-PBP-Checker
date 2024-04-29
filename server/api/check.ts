@@ -67,15 +67,18 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
         } else {
           problems.push('Data object `gameData` not found')
         }
+
+        const homePitchers: WBSCPlayerStats[] = []
+        const awayPitchers: WBSCPlayerStats[] = []
         boxScore = appData.boxScore
         if (boxScore) {
           const homeStats = boxScore[homeTeamId] as WBSCStats
-          const homePitchers = homeStats?.['90']
+          homePitchers.push(...homeStats['90'])
           if (!homePitchers) {
             problems.push('Data object for `homePitchers` not found')
           }
           const awayStats = boxScore[awayTeamId] as WBSCStats
-          const awayPitchers = awayStats?.['90']
+          awayPitchers.push(...awayStats['90'])
           if (!awayPitchers) {
             problems.push('Data object for `awayPitchers` not found')
           }
@@ -142,8 +145,13 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
 
         gamePlays = appData.gamePlays.all
         if (gamePlays) {
+          const pitchingProblems = analyzePitching(gamePlays, pitchers!, homePitchers, awayPitchers)
+          if (pitchingProblems.length > 0) {
+            problems.push(...pitchingProblems)
+          }
+
           // cycle through plays
-          const innings = Object.keys(gamePlays).map(p => parseInt(p)).sort((a, b) => a - b)
+          const innings = Object.keys(gamePlays).map(p => parseInt(p))
           innings.forEach((key) => {
             // top of inning
             gamePlays[key].top?.forEach((_play) => {

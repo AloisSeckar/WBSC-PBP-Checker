@@ -22,6 +22,17 @@ export type PBPCheck = {
   games: PBPGameCheck[]
 }
 
+export type PBPPitcherAnalysis = {
+  id: number
+  pbpName: string
+  fullName: string
+  ip?: number
+  starting?: boolean
+  win?: boolean
+  loss?: boolean
+  save?: boolean
+}
+
 // types derived from WBSC data object
 
 export type WBSCTournamentInfo = {
@@ -55,6 +66,7 @@ export type WBSCPitchers = {
 export type WBSCPlayerStats = {
   playerid: number
   teamid: number
+  uniform: string
   firstname: string
   lastname: string
   sub: number
@@ -80,6 +92,9 @@ export type WBSCBoxScore = {
 }
 
 export type WBSCGamePlay = {
+  batterid: number
+  pitcherid: number
+  runs: number
   narrative: string
 }
 
