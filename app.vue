@@ -12,15 +12,10 @@
     <div class="mb-2">
       <UTextarea id="games" v-model="gamesText" :rows="10" />
     </div>
-    <h2 class="mb-4 text-2xl font-bold">
-      Check result
-    </h2>
     <UButton @click="check">
       Check games
     </UButton>
-    <div class="mb-2">
-      <br>Raw test data <pre>{{ pbpCheckData }}</pre>
-    </div>
+    <DisplayPBPCheck :check-data="pbpCheckData" />
     <footer>
       <hr>
       <div>
@@ -52,6 +47,7 @@ async function check() {
       gameLinks: gamesArray.value,
     },
   })
+  console.debug(data)
   pbpCheckData.value = data
 }
 </script>
