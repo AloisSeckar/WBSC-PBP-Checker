@@ -42,6 +42,17 @@ export type PBPPitcherAnalysis = {
   save?: boolean
 }
 
+export type PBPPitchingAnalysis = {
+  homePitchers: PBPPitcherAnalysis[]
+  currentHomePitcher?: PBPPitcherAnalysis
+  homePoints: number
+  homeTeamIsAhead: boolean
+  awayPitchers: PBPPitcherAnalysis[]
+  currentAwayPitcher?: PBPPitcherAnalysis
+  awayPoints: number
+  awayTeamIsAhead: boolean
+}
+
 // types derived from WBSC data object
 
 export type WBSCTournamentInfo = {

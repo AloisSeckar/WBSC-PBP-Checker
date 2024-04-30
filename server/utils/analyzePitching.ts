@@ -1,12 +1,11 @@
-const homePitchers: PBPPitcherAnalysis[] = []
-let currentHomePitcher: PBPPitcherAnalysis | undefined = undefined
-let homePoints = 0
-let homeTeamIsAhead = false
-
-const awayPitchers: PBPPitcherAnalysis[] = []
-let currentAwayPitcher: PBPPitcherAnalysis | undefined = undefined
-let awayPoints = 0
-let awayTeamIsAhead = false
+const analysis: PBPPitchingAnalysis = {
+  homePitchers: [],
+  homePoints: 0,
+  homeTeamIsAhead: false,
+  awayPitchers: [],
+  awayPoints: 0,
+  awayTeamIsAhead: false,
+}
 
 export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppData) {
   const pitchingProblems: string[] = []
@@ -21,13 +20,13 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   if (boxScore) {
     const homeStats = boxScore[homeTeamId] as WBSCStats
     homePitchersData.push(...homeStats['90'])
-    if (!homePitchers) {
-      pitchingProblems.push('Data object for `homePitchers` not found')
+    if (homePitchersData.length < 1) {
+      pitchingProblems.push('Stats data for `homePitchers` not found')
     }
     const awayStats = boxScore[awayTeamId] as WBSCStats
     awayPitchersData.push(...awayStats['90'])
-    if (!awayPitchers) {
-      pitchingProblems.push('Data object for `awayPitchers` not found')
+    if (awayPitchersData.length < 1) {
+      pitchingProblems.push('Stats data for `awayPitchers` not found')
     }
     const pitcherRecords = [...homePitchersData, ...awayPitchersData]
 
@@ -90,12 +89,12 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
 
   // export function analyzePitching(gamePlays: WBSCGamePlays, pitchers: WBSCPitchers, homePitchersData: WBSCPlayerStats[], awayPitchersData: WBSCPlayerStats[]): string[] {
   init()
-  homePitchersData.forEach(p => homePitchers.push(toPBPPitcherAnalysis(p)))
-  currentHomePitcher = homePitchers.at(0)!
-  currentHomePitcher.starting = true
-  awayPitchersData.forEach(p => awayPitchers.push(toPBPPitcherAnalysis(p)))
-  currentAwayPitcher = awayPitchers.at(0)!
-  currentAwayPitcher.starting = true
+  homePitchersData.forEach(p => analysis.homePitchers.push(toPBPPitcherAnalysis(p)))
+  analysis.currentHomePitcher = analysis.homePitchers.at(0)!
+  analysis.currentHomePitcher.starting = true
+  awayPitchersData.forEach(p => analysis.awayPitchers.push(toPBPPitcherAnalysis(p)))
+  analysis.currentAwayPitcher = analysis.awayPitchers.at(0)!
+  analysis.currentAwayPitcher.starting = true
 
   const gamePlays = appData.gamePlays.all
   for (const inn in gamePlays) {
@@ -103,14 +102,14 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
       // handle scoring plays
       if (play.narrative.includes('scores') || play.narrative.includes('homers')) {
         console.log(play.narrative)
-        awayPoints += play.runs
-        if (awayPoints > homePoints && !awayTeamIsAhead) {
+        analysis.awayPoints += play.runs
+        if (isAwayLeading() && !analysis.awayTeamIsAhead) {
           awayTakesLead()
-          console.log('AWAY takes the lead', homePoints, awayPoints)
-          console.log('Pitchers', currentHomePitcher?.pbpName, currentAwayPitcher?.pbpName)
-        } else if (awayPoints === homePoints && homeTeamIsAhead) {
-          gameTied()
-          console.log('AWAY tied the game', homePoints, awayPoints)
+          console.log('AWAY takes the lead', analysis.homePoints, analysis.awayPoints)
+          console.log('Pitchers', analysis.currentHomePitcher?.pbpName, analysis.currentAwayPitcher?.pbpName)
+        } else if (isTiedGame() && analysis.homeTeamIsAhead) {
+          gameTiedAgain()
+          console.log('AWAY tied the game', analysis.homePoints, analysis.awayPoints)
         }
       }
       // handle substitutions
@@ -123,14 +122,14 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
       // handle scoring plays
       if (play.narrative.includes('scores') || play.narrative.includes('homers')) {
         console.log(play.narrative)
-        homePoints += play.runs
-        if (homePoints > awayPoints && !homeTeamIsAhead) {
+        analysis.homePoints += play.runs
+        if (isHomeLeading() && !analysis.homeTeamIsAhead) {
           homeTakesLead()
-          console.log('HOME takes the lead', homePoints, awayPoints)
-          console.log('Pitchers', currentHomePitcher?.pbpName, currentAwayPitcher?.pbpName)
-        } else if (homePoints === awayPoints && awayTeamIsAhead) {
-          gameTied()
-          console.log('HOME tied the game', homePoints, awayPoints)
+          console.log('HOME takes the lead', analysis.homePoints, analysis.awayPoints)
+          console.log('Pitchers', analysis.currentHomePitcher?.pbpName, analysis.currentAwayPitcher?.pbpName)
+        } else if (isTiedGame() && analysis.awayTeamIsAhead) {
+          gameTiedAgain()
+          console.log('HOME tied the game', analysis.homePoints, analysis.awayPoints)
         }
       }
       // handle substitutions
@@ -141,15 +140,15 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
     })
   }
 
-  console.log(homePitchers)
-  console.log(awayPitchers)
+  console.log(analysis.homePitchers)
+  console.log(analysis.awayPitchers)
 
   // confront analysis with scored results
 
   const pitchers = appData.boxScore.pitchers
 
-  const winningTeamPitchers = homePoints > awayPoints ? homePitchers : awayPitchers
-  const losingTeamPitchers = homePoints > awayPoints ? awayPitchers : homePitchers
+  const winningTeamPitchers = isHomeLeading() ? analysis.homePitchers : analysis.awayPitchers
+  const losingTeamPitchers = isHomeLeading() ? analysis.awayPitchers : analysis.homePitchers
 
   const correctWin = winningTeamPitchers.find(p => p.win)
   if (correctWin?.id !== pitchers.win?.id) {
@@ -168,50 +167,62 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   return pitchingProblems
 }
 
+function isHomeLeading() {
+  return analysis.homePoints > analysis.awayPoints
+}
+
+function isAwayLeading() {
+  return analysis.awayPoints > analysis.homePoints
+}
+
+function isTiedGame() {
+  return analysis.homePoints === analysis.awayPoints
+}
+
 function homeTakesLead() {
   clearWL()
-  currentAwayPitcher!.loss = true
-  currentHomePitcher!.win = true
-  homeTeamIsAhead = true
-  awayTeamIsAhead = false
+  analysis.currentAwayPitcher!.loss = true
+  analysis.currentHomePitcher!.win = true
+  analysis.homeTeamIsAhead = true
+  analysis.awayTeamIsAhead = false
 }
 
 function awayTakesLead() {
   clearWL()
-  currentAwayPitcher!.win = true
-  currentHomePitcher!.loss = true
-  awayTeamIsAhead = true
-  homeTeamIsAhead = false
+  analysis.currentAwayPitcher!.win = true
+  analysis.currentHomePitcher!.loss = true
+  analysis.awayTeamIsAhead = true
+  analysis.homeTeamIsAhead = false
+}
+
+function gameTiedAgain() {
+  clearWL()
+  analysis.homeTeamIsAhead = false
+  analysis.awayTeamIsAhead = false
 }
 
 function clearWL() {
-  homePitchers.forEach((p) => {
+  analysis.homePitchers.forEach((p) => {
     p.win = p.loss = false
   })
-  awayPitchers.forEach((p) => {
+  analysis.awayPitchers.forEach((p) => {
     p.win = p.loss = false
   })
-}
-
-function gameTied() {
-  clearWL()
-  homeTeamIsAhead = false
-  awayTeamIsAhead = false
 }
 
 function changePitcher(play: string, home: boolean) {
   const subInfo = play.split(' ')
   const newPitcher = `${subInfo[2]} ${subInfo[3]}`
   if (home) {
-    homePitchers.forEach((p) => {
+    analysis.homePitchers.forEach((p) => {
       if (p.pbpName === newPitcher) {
-        currentHomePitcher = p
+        analysis.currentHomePitcher = p
       }
     })
   } else {
-    awayPitchers.forEach((p) => {
+    analysis.awayPitchers.forEach((p) => {
       if (p.pbpName === newPitcher) {
-        currentAwayPitcher = p
+        analysis.currentAwayPitcher = p
       }
     })
   }
@@ -227,13 +238,13 @@ function toPBPPitcherAnalysis(stats: WBSCPlayerStats): PBPPitcherAnalysis {
 }
 
 function init() {
-  homePitchers.length = 0
-  currentHomePitcher = undefined
-  homePoints = 0
-  homeTeamIsAhead = false
+  analysis.homePitchers.length = 0
+  analysis.currentHomePitcher = undefined
+  analysis.homePoints = 0
+  analysis.homeTeamIsAhead = false
 
-  awayPitchers.length = 0
-  currentAwayPitcher = undefined
-  awayPoints = 0
-  awayTeamIsAhead = false
+  analysis.awayPitchers.length = 0
+  analysis.currentAwayPitcher = undefined
+  analysis.awayPoints = 0
+  analysis.awayTeamIsAhead = false
 }
