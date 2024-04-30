@@ -39,7 +39,8 @@ export type PBPPitcherAnalysis = {
   starting?: boolean
   win?: boolean
   loss?: boolean
-  save?: boolean
+  canHaveSave?: boolean // when entering the game, score is close
+  canHaveSave3?: boolean // when entering the game, team is leading by 3 or less points
 }
 
 export type PBPPitchingAnalysis = {
@@ -112,9 +113,13 @@ export type WBSCBoxScore = {
 }
 
 export type WBSCGamePlay = {
+  playorder: number
   batterid: number
   pitcherid: number
   runs: number
+  runner1: number
+  runner2: number
+  runner3: number
   narrative: string
 }
 

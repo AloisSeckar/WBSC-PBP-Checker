@@ -1,3 +1,5 @@
+import type { PBPGameAnalysis, PBPPitcherAnalysis, WBSCGamePlay } from './types'
+
 const analysis: PBPPitchingAnalysis = {
   homePitchers: [],
   homePoints: 0,
@@ -65,7 +67,6 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
         pitchingProblems.push('Losing pitcher not set')
       }
       if (pitchers.save) {
-        // TODO check if valid S
         const savePitcher = findPitcher(pitchers.save.id, pitcherRecords)!
         // must be correct team
         if (!checkCorrectTeam(savePitcher, winner === 'home' ? homeTeamId : awayTeamId)) {
@@ -75,10 +76,7 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
         if (savePitcher.pitch_ip === '0.0') {
           pitchingProblems.push('Save pitcher doesn\'t have any IP')
         }
-        // TODO rules must be fullfiled
         console.log(savePitcher?.firstname + ' ' + savePitcher?.lastname)
-      } else {
-        // TODO check if SAVE necessary
       }
     } else {
       pitchingProblems.push('Data object `pitchers` not found')
@@ -115,7 +113,8 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
       // handle substitutions
       if (play.narrative.includes('Pitching Change')) {
         console.log(play.narrative)
-        changePitcher(play.narrative, true)
+        const nextPlay = getNextPlay(gamePlays[inn].top, play.playorder)
+        changePitcher(play.narrative, nextPlay, true)
       }
     })
     gamePlays[inn].bot?.forEach((play) => {
@@ -135,7 +134,8 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
       // handle substitutions
       if (play.narrative.includes('Pitching Change')) {
         console.log(play.narrative)
-        changePitcher(play.narrative, false)
+        const nextPlay = getNextPlay(gamePlays[inn].bot, play.playorder)
+        changePitcher(play.narrative, nextPlay, false)
       }
     })
   }
@@ -150,21 +150,38 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   const winningTeamPitchers = isHomeLeading() ? analysis.homePitchers : analysis.awayPitchers
   const losingTeamPitchers = isHomeLeading() ? analysis.awayPitchers : analysis.homePitchers
 
-  const correctWin = winningTeamPitchers.find(p => p.win)
-  if (correctWin?.id !== pitchers.win?.id) {
+  const correctWin = winningTeamPitchers.find(p => p.win)!
+  if (correctWin.id !== pitchers.win?.id) {
     if (correctWin?.starting && !checkEnoughInnings(correctWin, innings, variant)) {
       // TODO can we verify it is the best choice?
       console.log('Starting pitcher has not enough IP => someone else was correctly chosen by the scorer')
     } else {
-      pitchingProblems.push(`Winning pitcher should be ${correctWin?.fullName} (${pitchers.win?.fullName} was scored)`)
+      pitchingProblems.push(`${correctWin?.fullName} should have W (${pitchers.win?.fullName} was scored)`)
     }
   }
-  const correctLoss = losingTeamPitchers.find(p => p.loss)
-  if (correctLoss?.id !== pitchers.loss?.id) {
-    pitchingProblems.push(`Losing pitcher should be ${correctLoss?.fullName} (${pitchers.loss?.fullName} was scored)`)
+
+  const correctLoss = losingTeamPitchers.find(p => p.loss)!
+  if (correctLoss.id !== pitchers.loss?.id) {
+    pitchingProblems.push(`${correctLoss?.fullName} should have L (${pitchers.loss?.fullName} was scored)`)
+  }
+
+  const last = winningTeamPitchers.at(-1)!
+  if (shouldHaveSave(last, correctWin.id)) {
+    if (last.id !== pitchers.save?.id) {
+      pitchingProblems.push(`${last?.fullName} should have S (${pitchers.save?.fullName || 'N/A'} was scored)`)
+    }
   }
 
   return pitchingProblems
+}
+
+function shouldHaveSave(pitcher: PBPPitcherAnalysis, winner: number) {
+  return pitcher.id !== winner // W > S
+    && (
+      pitcher.pitch_ip >= '3.0' // has at least 3 IP
+      || (pitcher.pitch_ip >= '1.0' && pitcher.canHaveSave3) // has at least 1 IP and entered with 3 or less runs ahead
+      || (pitcher.canHaveSave) // has entered with potentional tying run
+    )
 }
 
 function isHomeLeading() {
@@ -179,8 +196,20 @@ function isTiedGame() {
   return analysis.homePoints === analysis.awayPoints
 }
 
+function isCloseGame(play: WBSCGamePlay) {
+  // there is always 1 batter in thr box and 1 in circle who can score 2 points
+  // plus there are up to 3 runners
+  let closeFactor = 2
+  if (play.runner1 > 0) closeFactor++
+  if (play.runner2 > 0) closeFactor++
+  if (play.runner3 > 0) closeFactor++
+  const difference = Math.abs(analysis.homePoints - analysis.awayPoints)
+  // closer may have save, if there is potential to tie the game for the batter in circle
+  return difference <= closeFactor
+}
+
 function homeTakesLead() {
-  clearWL()
+  clearWLS()
   analysis.currentAwayPitcher!.loss = true
   analysis.currentHomePitcher!.win = true
   analysis.homeTeamIsAhead = true
@@ -188,7 +217,7 @@ function homeTakesLead() {
 }
 
 function awayTakesLead() {
-  clearWL()
+  clearWLS()
   analysis.currentAwayPitcher!.win = true
   analysis.currentHomePitcher!.loss = true
   analysis.awayTeamIsAhead = true
@@ -196,36 +225,44 @@ function awayTakesLead() {
 }
 
 function gameTiedAgain() {
-  clearWL()
+  clearWLS()
   analysis.homeTeamIsAhead = false
   analysis.awayTeamIsAhead = false
 }
 
-function clearWL() {
+function clearWLS() {
   analysis.homePitchers.forEach((p) => {
-    p.win = p.loss = false
+    p.win = p.loss = p.canHaveSave = p.canHaveSave3 = false
   })
   analysis.awayPitchers.forEach((p) => {
-    p.win = p.loss = false
+    p.win = p.loss = p.canHaveSave = p.canHaveSave3 = false
   })
 }
 
-function changePitcher(play: string, home: boolean) {
+function changePitcher(play: string, nextPlay: WBSCGamePlay, home: boolean) {
   const subInfo = play.split(' ')
   const newPitcher = `${subInfo[2]} ${subInfo[3]}`
   if (home) {
     analysis.homePitchers.forEach((p) => {
       if (p.pbpName === newPitcher) {
         analysis.currentHomePitcher = p
+        analysis.currentHomePitcher.canHaveSave = isHomeLeading() && isCloseGame(nextPlay)
+        analysis.currentHomePitcher.canHaveSave3 = isHomeLeading() && analysis.homePoints - analysis.awayPoints <= 3
       }
     })
   } else {
     analysis.awayPitchers.forEach((p) => {
       if (p.pbpName === newPitcher) {
         analysis.currentAwayPitcher = p
+        analysis.currentAwayPitcher.canHaveSave = isAwayLeading() && isCloseGame(nextPlay)
+        analysis.currentAwayPitcher.canHaveSave3 = isAwayLeading() && analysis.awayPoints - analysis.homePoints <= 3
       }
     })
   }
+}
+
+function getNextPlay(plays: WBSCGamePlay[], order: number) {
+  return plays.find(p => p.playorder = order + 1)!
 }
 
 function toPBPPitcherAnalysis(stats: WBSCPlayerStats): PBPPitcherAnalysis {
