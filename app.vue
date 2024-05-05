@@ -1,6 +1,6 @@
 <template>
   <div class="p-4">
-    <div v-show="loading" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-28 z-10 mt-2 bg-primary text-black text-center font-bold rounded">
+    <div v-show="loading" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-28 z-10 pt-1 bg-primary text-black text-center font-bold rounded">
       LOADING...
     </div>
     <h1 class="mb-4 text-3xl font-bold">
@@ -52,7 +52,7 @@ const gamesText = ref('')
 const gamesArray = computed(() => gamesText.value.split('\n'))
 
 const filterVariant = ref('')
-const variantOptions = ['baseball', 'softball']
+const variantOptions = ['', 'baseball', 'softball']
 
 const filterLeague = ref('')
 const leagueOptions = computed(() => {
@@ -62,24 +62,26 @@ const leagueOptions = computed(() => {
     case 'softball':
       return ['ELM', 'ELZ', 'ELJi', 'ELJy']
     default:
-      return []
+      return ['']
   }
 })
 
 async function getLinks() {
-  loading.value = true
-  nextTick()
-  console.debug(filterVariant.value, filterLeague.value)
-  const data = await $fetch<string[]>('/api/links', {
-    method: 'GET',
-    params: {
-      variant: filterVariant.value,
-      league: filterLeague.value,
-    },
-  })
-  console.debug(data)
-  gamesText.value = data.join('\n')
-  loading.value = false
+  if (filterVariant.value && filterLeague.value) {
+    loading.value = true
+    nextTick()
+    console.debug(filterVariant.value, filterLeague.value)
+    const data = await $fetch<string[]>('/api/links', {
+      method: 'GET',
+      params: {
+        variant: filterVariant.value,
+        league: filterLeague.value,
+      },
+    })
+    console.debug(data)
+    gamesText.value = data.join('\n')
+    loading.value = false
+  }
 }
 
 const pbpCheckData = ref({})
