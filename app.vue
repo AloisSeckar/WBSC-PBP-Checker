@@ -16,6 +16,9 @@
       Get links for:
       <USelect v-model="filterVariant" :options="variantOptions" />
       <USelect v-model="filterLeague" :options="leagueOptions" />
+      in
+      <USelect v-model="filterMonth" :options="monthOptions" />
+      <USelect v-model="filterYear" :options="yearOptions" disabled />
       <UButton @click="getLinks">
         Get links
       </UButton>
@@ -55,13 +58,19 @@ const gamesArray = computed(() => gamesText.value.split('\n'))
 const filterVariant = ref('')
 const variantOptions = ['', 'baseball', 'softball']
 
+const filterMonth = ref('all')
+const monthOptions = ['all', '04', '05', '06', '07', '08', '09', '10']
+
+const filterYear = '2024'
+const yearOptions = ['2024']
+
 const filterLeague = ref('')
 const leagueOptions = computed(() => {
   switch (filterVariant.value) {
     case 'baseball':
       return ['EXL', 'LIG', 'U23', 'U18']
     case 'softball':
-      return ['ELM', 'ELZ', 'ELJi', 'ELJy']
+      return ['ELM', 'ELZ', 'ELJI', 'ELJY']
     default:
       return ['']
   }
@@ -77,6 +86,8 @@ async function getLinks() {
       params: {
         variant: filterVariant.value,
         league: filterLeague.value,
+        dateFrom: evalDateFrom(),
+        dateTo: evalDateTo(),
       },
     })
     console.debug(data)
@@ -118,4 +129,24 @@ const { pause, resume } = useIntervalFn(() => {
     loadingText.value += '.'
   }
 }, 400)
+
+function evalDateFrom() {
+  if (filterMonth.value !== 'all') {
+    return `${filterYear}/${filterMonth.value}/01`
+  }
+}
+
+function evalDateTo() {
+  switch (filterMonth.value) {
+    case '04':
+    case '06':
+    case '09':
+      return `${filterYear}/${filterMonth.value}/30`
+    case '05':
+    case '07':
+    case '08':
+    case '10':
+      return `${filterYear}/${filterMonth.value}/31`
+  }
+}
 </script>

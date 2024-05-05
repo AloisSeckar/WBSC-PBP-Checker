@@ -9,6 +9,8 @@ export default defineEventHandler(async (event): Promise<string[]> => {
 
   const variant = query.variant as string
   const league = query.league as string
+  const dateFrom = query.dateFrom as string
+  const dateTo = query.dateTo as string
 
   if (variant === 'softball') {
     const targetCompetitions = league ? [getLinkForLeague(league)] : LINKS_SOFTBALL
@@ -18,9 +20,31 @@ export default defineEventHandler(async (event): Promise<string[]> => {
       const softballGameLinks = await leaguePage.$$eval('span.hidden-xs > a', el => el.filter(x => x.getAttribute('href')?.includes('do=matchplay')).map(x => x.getAttribute('href')))
       for (const link of softballGameLinks) {
         if (link) {
-          const gamePage = await browser.newPage()
-          await gamePage.goto('https://softball.cz/' + link)
-          gameLinks.push(gamePage.url())
+          try {
+            const gamePage = await browser.newPage()
+            await gamePage.goto('https://softball.cz/' + link)
+
+            let push = true
+            if (dateFrom || dateTo) {
+              let gameDate = await gamePage.$eval('div.info > p', el => el.innerText?.split(',')[0])
+              const dateParts = gameDate.split('/')
+              gameDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`
+              if (dateFrom && dateFrom > gameDate) {
+                push = false
+              } else if (dateTo && dateTo < gameDate) {
+                push = false
+                // since games are ordered, once we have higher date than upper limit, we may end
+                break
+              }
+            }
+
+            if (push) {
+              gameLinks.push(gamePage.url())
+            }
+          } catch (error: unknown) {
+            console.error('failed to process: ' + link)
+            console.error(error)
+          }
         }
       }
     }
