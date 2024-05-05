@@ -9,6 +9,14 @@
     <h2 class="mb-4 text-2xl font-bold">
       Games to be checked
     </h2>
+    <div class="mb-2 flex flex-row gap-2 items-center">
+      Get links for:
+      <USelect v-model="filterVariant" :options="variantOptions" />
+      <USelect v-model="filterLeague" :options="leagueOptions" />
+      <UButton @click="getLinks">
+        Get links
+      </UButton>
+    </div>
     <div class="mb-2">
       <UTextarea id="games" v-model="gamesText" :rows="10" />
     </div>
@@ -37,6 +45,34 @@ import type { PBPCheck } from './server/utils/types'
 
 const gamesText = ref('')
 const gamesArray = computed(() => gamesText.value.split('\n'))
+
+const filterVariant = ref('')
+const variantOptions = ['baseball', 'softball']
+
+const filterLeague = ref('')
+const leagueOptions = computed(() => {
+  switch (filterVariant.value) {
+    case 'baseball':
+      return ['EXL', 'LIG', 'U23', 'U18']
+    case 'softball':
+      return ['ELM', 'ELZ', 'ELJi', 'ELJy']
+    default:
+      return []
+  }
+})
+
+async function getLinks() {
+  console.debug(filterVariant.value, filterLeague.value)
+  const data = await $fetch<string[]>('/api/links', {
+    method: 'GET',
+    params: {
+      variant: filterVariant.value,
+      league: filterLeague.value,
+    },
+  })
+  console.debug(data)
+  gamesText.value = data.join('\n')
+}
 
 const pbpCheckData = ref({})
 async function check() {
