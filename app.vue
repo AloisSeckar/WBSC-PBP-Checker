@@ -1,5 +1,8 @@
 <template>
   <div class="p-4">
+    <div v-show="loading" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-28 z-10 mt-2 bg-primary text-black text-center font-bold rounded">
+      LOADING...
+    </div>
     <h1 class="mb-4 text-3xl font-bold">
       WBSC-PBP-Checker
     </h1>
@@ -43,6 +46,8 @@
 <script setup lang="ts">
 import type { PBPCheck } from './server/utils/types'
 
+const loading = ref(false)
+
 const gamesText = ref('')
 const gamesArray = computed(() => gamesText.value.split('\n'))
 
@@ -62,6 +67,8 @@ const leagueOptions = computed(() => {
 })
 
 async function getLinks() {
+  loading.value = true
+  nextTick()
   console.debug(filterVariant.value, filterLeague.value)
   const data = await $fetch<string[]>('/api/links', {
     method: 'GET',
@@ -72,10 +79,13 @@ async function getLinks() {
   })
   console.debug(data)
   gamesText.value = data.join('\n')
+  loading.value = false
 }
 
 const pbpCheckData = ref({})
 async function check() {
+  loading.value = true
+  nextTick()
   console.debug(gamesArray.value)
   const data = await $fetch<PBPCheck>('/api/check', {
     method: 'POST',
@@ -85,5 +95,6 @@ async function check() {
   })
   console.debug(data)
   pbpCheckData.value = data
+  loading.value = false
 }
 </script>
