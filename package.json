@@ -9,6 +9,8 @@
   "devDependencies": {
     "@nuxt/eslint": "0.3.10",
     "@nuxt/ui": "2.15.2",
+    "@vueuse/core": "10.9.0",
+    "@vueuse/nuxt": "10.9.0",
     "eslint": "8.57.0",
     "node-html-parser": "6.1.13",
     "nuxt": "3.11.2",

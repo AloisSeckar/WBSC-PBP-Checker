@@ -1,7 +1,7 @@
 <template>
   <div class="p-4">
-    <div v-show="loading" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-28 z-10 pt-1 bg-primary text-black text-center font-bold rounded">
-      LOADING...
+    <div v-show="loading" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-28 z-10 pt-1 pl-3 bg-primary text-gray-900 font-bold rounded">
+      {{ loadingText }}
     </div>
     <h1 class="mb-4 text-3xl font-bold">
       WBSC-PBP-Checker
@@ -44,6 +44,7 @@
 </template>
 
 <script setup lang="ts">
+import { useIntervalFn } from '@vueuse/core'
 import type { PBPCheck } from './server/utils/types'
 
 const loading = ref(false)
@@ -68,7 +69,7 @@ const leagueOptions = computed(() => {
 
 async function getLinks() {
   if (filterVariant.value && filterLeague.value) {
-    loading.value = true
+    showPending(true)
     nextTick()
     console.debug(filterVariant.value, filterLeague.value)
     const data = await $fetch<string[]>('/api/links', {
@@ -80,13 +81,13 @@ async function getLinks() {
     })
     console.debug(data)
     gamesText.value = data.join('\n')
-    loading.value = false
+    showPending(false)
   }
 }
 
 const pbpCheckData = ref({})
 async function check() {
-  loading.value = true
+  showPending(true)
   nextTick()
   console.debug(gamesArray.value)
   const data = await $fetch<PBPCheck>('/api/check', {
@@ -97,6 +98,24 @@ async function check() {
   })
   console.debug(data)
   pbpCheckData.value = data
-  loading.value = false
+  showPending(false)
 }
+
+function showPending(show: boolean) {
+  loading.value = show
+  if (show) {
+    resume()
+  } else {
+    pause()
+  }
+}
+
+const loadingText = ref('LOADING...')
+const { pause, resume } = useIntervalFn(() => {
+  if (loadingText.value.endsWith('...')) {
+    loadingText.value = 'LOADING'
+  } else {
+    loadingText.value += '.'
+  }
+}, 400)
 </script>
