@@ -1,3 +1,4 @@
+import type { Page } from 'puppeteer'
 import { launch } from 'puppeteer'
 
 export default defineEventHandler(async (event): Promise<string[]> => {
@@ -26,9 +27,7 @@ export default defineEventHandler(async (event): Promise<string[]> => {
 
             let push = true
             if (dateFrom || dateTo) {
-              let gameDate = await gamePage.$eval('div.info > p', el => el.innerText?.split(',')[0])
-              const dateParts = gameDate.split('/')
-              gameDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`
+              const gameDate = await extractGameDate(gamePage)
               if (dateFrom && dateFrom > gameDate) {
                 push = false
               } else if (dateTo && dateTo < gameDate) {
@@ -62,7 +61,22 @@ export default defineEventHandler(async (event): Promise<string[]> => {
             const wbscLink = await baseballGamePage.$eval('div.ke-stazeni > a', el => el.getAttribute('href'))
             if (wbscLink) {
               await baseballGamePage.goto(wbscLink)
-              gameLinks.push(baseballGamePage.url())
+
+              let push = true
+              if (dateFrom || dateTo) {
+                const gameDate = await extractGameDate(baseballGamePage)
+                if (dateFrom && dateFrom > gameDate) {
+                  push = false
+                } else if (dateTo && dateTo < gameDate) {
+                  push = false
+                  // since games are ordered, once we have higher date than upper limit, we may end
+                  break
+                }
+              }
+
+              if (push) {
+                gameLinks.push(baseballGamePage.url())
+              }
             }
           }
         }
@@ -72,3 +86,9 @@ export default defineEventHandler(async (event): Promise<string[]> => {
 
   return gameLinks
 })
+
+async function extractGameDate(pbpPage: Page): Promise<string> {
+  const gameDate = await pbpPage.$eval('div.info > p', el => el.innerText?.split(',')[0])
+  const dateParts = gameDate.split('/')
+  return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`
+}
