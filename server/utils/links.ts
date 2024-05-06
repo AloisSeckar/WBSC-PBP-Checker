@@ -7,10 +7,10 @@ export const LINK_S_ELJY = 'https://softball.cz/modules.php?op=modload&name=liga
 export const LINKS_SOFTBALL = [LINK_S_ELM, LINK_S_ELZ, LINK_S_ELJI, LINK_S_ELJY]
 
 // links to competition schedules on www.baseball.cz website
-export const LINK_B_EXL = 'https://www.baseball.cz/soutez-753/extraliga/zakladni-cast/rozpis'
-export const LINK_B_LIG = 'https://www.baseball.cz/soutez-754/1-liga/zakladni-cast/rozpis'
-export const LINK_B_U23 = 'https://www.baseball.cz/soutez-755/prospect-league-u23/zakladni-cast/rozpis'
-export const LINK_B_U18 = 'https://www.baseball.cz/soutez-756/extraliga-u18/zakladni-cast/rozpis'
+export const LINK_B_EXL = 'https://www.baseball.cz/soutez-753/extraliga/zakladni-cast'
+export const LINK_B_LIG = 'https://www.baseball.cz/soutez-754/1-liga/zakladni-cast'
+export const LINK_B_U23 = 'https://www.baseball.cz/soutez-755/prospect-league-u23/zakladni-cast'
+export const LINK_B_U18 = 'https://www.baseball.cz/soutez-756/extraliga-u18/zakladni-cast'
 
 export const LINKS_BASEBALL = [LINK_B_EXL, LINK_B_LIG, LINK_B_U23, LINK_B_U18]
 
