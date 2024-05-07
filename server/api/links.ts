@@ -12,40 +12,37 @@ export default defineEventHandler(async (event): Promise<string[]> => {
   const league = query.league as string
 
   const month = query.month as string
-  const year = query.year as string
-  const dateFrom = month ? `${year ? year : '2024'}/${month}/01` : ''
-  const dateTo = month ? `${year ? year : '2024'}/${month}/31` : ''
+  const year = query.year as string || '2024'
+  const dateFrom = month ? `${year}/${month}/01` : ''
+  const dateTo = month ? `${year}/${month}/31` : ''
 
   if (variant === 'softball') {
     const targetCompetitions = league ? [getLinkForLeague(league)] : LINKS_SOFTBALL
     for (const competition of targetCompetitions) {
       const leaguePage = await browser.newPage()
-      await leaguePage.goto(competition)
-      const softballGameLinks = await leaguePage.$$eval('span.hidden-xs > a', el => el.filter(x => x.getAttribute('href')?.includes('do=matchplay')).map(x => x.getAttribute('href')))
-      for (const link of softballGameLinks) {
-        if (link) {
-          try {
-            const gamePage = await browser.newPage()
-            await gamePage.goto('https://softball.cz/' + link)
 
-            let push = true
-            if (month) {
-              const gameDate = await extractGameDate(gamePage)
-              if (dateFrom && dateFrom > gameDate) {
-                push = false
-              } else if (dateTo && dateTo < gameDate) {
-                push = false
-                // since games are ordered, once we have higher date than upper limit, we may end
-                break
-              }
-            }
+      const dailyScheduleLinks: string[] = []
+      if (month) {
+        for (let i = 1; i <= 31; i++) {
+          dailyScheduleLinks.push(competition + `&hraciden=${year}-${month}-${String(i).padStart(2, '0')}`)
+        }
+      } else {
+        dailyScheduleLinks.push(competition + '&hraciden=0000-00-00')
+      }
 
-            if (push) {
+      for (const scheduleLink of dailyScheduleLinks) {
+        await leaguePage.goto(scheduleLink)
+        const softballGameLinks = await leaguePage.$$eval('span.hidden-xs > a', el => el.filter(x => x.getAttribute('href')?.includes('do=matchplay')).map(x => x.getAttribute('href')))
+        for (const link of softballGameLinks) {
+          if (link) {
+            try {
+              const gamePage = await browser.newPage()
+              await gamePage.goto('https://softball.cz/' + link)
               gameLinks.push(gamePage.url())
+            } catch (error: unknown) {
+              console.error('failed to process: ' + link)
+              console.error(error)
             }
-          } catch (error: unknown) {
-            console.error('failed to process: ' + link)
-            console.error(error)
           }
         }
       }
