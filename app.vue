@@ -78,6 +78,8 @@ const leagueOptions = computed(() => {
 
 async function getLinks() {
   if (filterVariant.value && filterLeague.value) {
+    gamesText.value = ''
+    pbpCheckData.value = {}
     showPending(true)
     nextTick()
     console.debug(filterVariant.value, filterLeague.value)
@@ -98,6 +100,7 @@ async function getLinks() {
 
 const pbpCheckData = ref({})
 async function check() {
+  pbpCheckData.value = {}
   showPending(true)
   nextTick()
   console.debug(gamesArray.value)
