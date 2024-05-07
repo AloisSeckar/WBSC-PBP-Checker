@@ -1,7 +1,13 @@
 <template>
   <div class="p-4">
-    <div v-show="loading" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-28 z-10 pt-1 pl-3 bg-primary text-gray-900 font-bold rounded">
-      {{ loadingText }}
+    <div
+      v-show="loading"
+      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-32 z-10 bg-primary text-gray-900 font-bold rounded flex items-center justify-center"
+      :class="loadingBorder"
+    >
+      <div class="w-[90px]">
+        {{ loadingText }}
+      </div>
     </div>
     <h1 class="mb-4 text-3xl font-bold">
       WBSC-PBP-Checker
@@ -81,7 +87,6 @@ async function getLinks() {
     gamesText.value = ''
     pbpCheckData.value = {}
     showPending(true)
-    nextTick()
     console.debug(filterVariant.value, filterLeague.value)
     const data = await $fetch<string[]>('/api/links', {
       method: 'GET',
@@ -102,7 +107,6 @@ const pbpCheckData = ref({})
 async function check() {
   pbpCheckData.value = {}
   showPending(true)
-  nextTick()
   console.debug(gamesArray.value)
   const data = await $fetch<PBPCheck>('/api/check', {
     method: 'POST',
@@ -125,11 +129,21 @@ function showPending(show: boolean) {
 }
 
 const loadingText = ref('LOADING...')
+const loadingBorder = ref('border-[0px]')
 const { pause, resume } = useIntervalFn(() => {
   if (loadingText.value.endsWith('...')) {
     loadingText.value = 'LOADING'
   } else {
     loadingText.value += '.'
   }
+
+  let border = parseInt(loadingBorder.value.at(-4)!)
+  if (border < 3) {
+    border++
+  } else {
+    border = 0
+  }
+  loadingBorder.value = `border-[${border}px]`
 }, 400)
+pause()
 </script>
