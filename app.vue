@@ -88,8 +88,8 @@ async function getLinks() {
       params: {
         variant: filterVariant.value,
         league: filterLeague.value,
-        month: filterMonth.value,
-        year: filterYear,
+        month: filterMonth.value !== 'all' ? filterMonth.value : '',
+        year: filterMonth.value !== 'all' ? filterYear : '',
       },
     })
     console.debug(data)
