@@ -86,8 +86,8 @@ async function getLinks() {
       params: {
         variant: filterVariant.value,
         league: filterLeague.value,
-        dateFrom: evalDateFrom(),
-        dateTo: evalDateTo(),
+        month: filterMonth.value,
+        year: filterYear,
       },
     })
     console.debug(data)
@@ -129,24 +129,4 @@ const { pause, resume } = useIntervalFn(() => {
     loadingText.value += '.'
   }
 }, 400)
-
-function evalDateFrom() {
-  if (filterMonth.value !== 'all') {
-    return `${filterYear}/${filterMonth.value}/01`
-  }
-}
-
-function evalDateTo() {
-  switch (filterMonth.value) {
-    case '04':
-    case '06':
-    case '09':
-      return `${filterYear}/${filterMonth.value}/30`
-    case '05':
-    case '07':
-    case '08':
-    case '10':
-      return `${filterYear}/${filterMonth.value}/31`
-  }
-}
 </script>

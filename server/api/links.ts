@@ -10,8 +10,11 @@ export default defineEventHandler(async (event): Promise<string[]> => {
 
   const variant = query.variant as string
   const league = query.league as string
-  const dateFrom = query.dateFrom as string
-  const dateTo = query.dateTo as string
+
+  const month = query.month as string
+  const year = query.year as string
+  const dateFrom = month ? `${year ? year : '2024'}/${month}/01` : ''
+  const dateTo = month ? `${year ? year : '2024'}/${month}/31` : ''
 
   if (variant === 'softball') {
     const targetCompetitions = league ? [getLinkForLeague(league)] : LINKS_SOFTBALL
@@ -26,7 +29,7 @@ export default defineEventHandler(async (event): Promise<string[]> => {
             await gamePage.goto('https://softball.cz/' + link)
 
             let push = true
-            if (dateFrom || dateTo) {
+            if (month) {
               const gameDate = await extractGameDate(gamePage)
               if (dateFrom && dateFrom > gameDate) {
                 push = false
