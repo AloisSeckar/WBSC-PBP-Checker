@@ -1,7 +1,7 @@
 <template>
   <div>
     <div :class="cssClass">
-      <div><strong>Game:</strong> <a :href="gameData.link">{{ gameData.game }}</a></div>
+      <div><strong>Game:</strong> <a :href="gameData.link" :class="link">{{ gameData.game }}</a></div>
       <div v-for="problem in gameData.problems" :key="problem.toString()">
         &#8594; {{ problem }}
       </div>
@@ -24,4 +24,5 @@ const cssClass = computed(() => {
   const colorsCss = props.gameData.result === 'OK' ? 'text-gray-900 bg-primary-400' : 'bg-red-300'
   return baseCss + ' ' + colorsCss
 })
+const link = 'text-gray-700 hover:text-primary-600'
 </script>
