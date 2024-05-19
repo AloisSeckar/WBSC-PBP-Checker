@@ -8,7 +8,7 @@
         <strong>Display:</strong> All results <UToggle v-model="errorsOnly" /> Errors only
       </div>
       <div>
-        <strong>Checked at:</strong> {{ checkData.date }}
+        <strong>Checked at:</strong> {{ useDateFormat(checkData.date, 'YYYY-MM-DD HH:mm:ss').value }}
       </div>
       <div v-for="gameData in displayedData" :key="gameData.link">
         <DisplayPBPGameCheck :game-data="gameData" />
