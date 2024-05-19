@@ -13,6 +13,7 @@ export type PBPGameCheckRequest = {
 export type PBPGameCheck = {
   link: string
   game: string
+  scorer: string
   result: PBPResult
   problems: string[]
 }
@@ -60,6 +61,14 @@ export type WBSCTournamentInfo = {
   innings: number
 }
 
+export type WBSCScorer = {
+  label: string
+}
+
+export type WBSCAssignment = {
+  person: WBSCScorer
+}
+
 export type WBSCGameData = {
   gamenumber: number
   homeid: number
@@ -70,6 +79,7 @@ export type WBSCGameData = {
   innings: number
   homeruns: number
   awayruns: number
+  assignments: WBSCAssignment[]
 }
 
 export type WBSCPitcher = {

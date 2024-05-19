@@ -12,6 +12,7 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
     const problems: string[] = []
 
     let gameTitle = 'UNKNOWN'
+    let gameScorer = 'UNKNOWN'
     let gameData
     let appData
     let gamePlays: WBSCGamePlays
@@ -63,6 +64,19 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
 
           // build game title
           gameTitle = `#${gameData.gamenumber} - ${gameData.homeioc} ${homePoints} vs. ${awayPoints} ${gameData.awayioc} (${gameData.start})`
+
+          // get scorer(s) name
+          if (gameData.assignments) {
+            console.log(gameData.assignments)
+            const scorers: string[] = []
+            gameData.assignments.forEach((a) => {
+              scorers.push(a.person?.label || 'UNKNOWN')
+            })
+            gameScorer = scorers.join(', ')
+            console.log(gameScorer)
+          } else {
+            problems.push('Data object `assignments` not found')
+          }
         } else {
           problems.push('Data object `gameData` not found')
         }
@@ -114,6 +128,7 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
     games.push({
       link: gameLink,
       game: gameTitle,
+      scorer: gameScorer,
       result: problems.length === 0 ? 'OK' : 'ERR',
       problems,
     })
