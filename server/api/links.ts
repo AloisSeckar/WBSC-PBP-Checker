@@ -64,7 +64,7 @@ export default defineEventHandler(async (event): Promise<string[]> => {
 
               let push = true
               if (dateFrom || dateTo) {
-                const gameDate = await extractGameDate(baseballGamePage)
+                const gameDate = await extractGameDate(baseballGamePage, detail)
                 if (dateFrom && dateFrom > gameDate) {
                   push = false
                 } else if (dateTo && dateTo < gameDate) {
@@ -87,8 +87,13 @@ export default defineEventHandler(async (event): Promise<string[]> => {
   return gameLinks
 })
 
-async function extractGameDate(pbpPage: Page): Promise<string> {
-  const gameDate = await pbpPage.$eval('div.info > p', el => el.innerText?.split(',')[0])
-  const dateParts = gameDate.split('/')
-  return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`
+async function extractGameDate(pbpPage: Page, link: string): Promise<string> {
+  if (await pbpPage.$('div.info > p')) {
+    const gameDate = await pbpPage.$eval('div.info > p', el => el.innerText?.split(',')[0])
+    const dateParts = gameDate.split('/')
+    return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`
+  } else {
+    console.warn('failed to extractGameDate from ' + link)
+    return '0000/00/00'
+  }
 }
