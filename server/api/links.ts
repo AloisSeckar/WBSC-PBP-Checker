@@ -1,10 +1,10 @@
 import type { Page } from 'puppeteer'
-import { launch } from 'puppeteer'
+import puppeteer from 'puppeteer'
 
 export default defineEventHandler(async (event): Promise<string[]> => {
   const gameLinks: string[] = []
 
-  const browser = await launch()
+  const browser = await puppeteer.launch()
 
   const query = getQuery(event)
 

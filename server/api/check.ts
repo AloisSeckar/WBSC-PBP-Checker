@@ -1,5 +1,5 @@
 import { parse } from 'node-html-parser'
-import { launch } from 'puppeteer'
+import puppeteer from 'puppeteer'
 
 export default defineEventHandler(async (event): Promise<PBPCheck> => {
   const body = await readBody(event) as PBPGameCheckRequest
@@ -7,7 +7,7 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
 
   const games: PBPGameCheck[] = []
 
-  const browser = await launch()
+  const browser = await puppeteer.launch()
   for (const gameLink of gameLinks) {
     const problems: string[] = []
 
