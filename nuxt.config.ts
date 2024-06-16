@@ -21,7 +21,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     emailPassword: '',
     public: {
-      automatedCheck: '0 6 * * MON'
-    }
+      automatedCheck: '0 6 * * MON',
+    },
   },
 })

@@ -3,7 +3,7 @@
   "scripts": {
     "eslint": "eslint .",
     "dev": "nuxt dev",
-    "build": "pnpm run eslint && nuxt build",
+    "build": "nuxt build",
     "start": "nuxt preview"
   },
   "devDependencies": {
