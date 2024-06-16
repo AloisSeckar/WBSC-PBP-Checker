@@ -7,19 +7,15 @@
     "start": "nuxt preview"
   },
   "devDependencies": {
-    "@nuxt/eslint": "0.3.10",
-    "@nuxt/ui": "2.15.2",
+    "@nuxt/eslint": "0.3.13",
+    "@nuxt/ui": "2.16.0",
     "@types/nodemailer": "6.4.15",
-    "@vueuse/core": "10.9.0",
-    "@vueuse/nuxt": "10.9.0",
-    "eslint": "8.57.0",
+    "@vueuse/core": "10.11.0",
+    "@vueuse/nuxt": "10.11.0",
     "node-html-parser": "6.1.13",
     "nodemailer": "6.9.13",
-    "nuxt": "3.11.2",
+    "nuxt": "3.12.2",
     "nuxt-cron": "1.5.1",
-    "puppeteer": "22.6.1"
-  },
-  "overrides": {
-    "vue": "latest"
+    "puppeteer": "22.11.0"
   }
 }
