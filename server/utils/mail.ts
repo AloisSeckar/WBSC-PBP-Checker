@@ -41,6 +41,8 @@ export async function sendEmailSummary(variant: PBPVariant, gamesChecked: number
     html += '<br /><strong>N/A</strong>'
   }
 
+  html += '<strong>Note:</strong> Check results are experimental. Always review reported problems manually and report issues to improve the tool.'
+
   console.log(html)
 
   const association = variant === 'baseball' ? 'ČBA' : 'ČSA'
@@ -49,7 +51,7 @@ export async function sendEmailSummary(variant: PBPVariant, gamesChecked: number
   const options = {
     from: 'czechscorekeepers@gmail.com',
     to: recipients,
-    subject: `WBSC PBP Checker - weekly check summary for ${association}`,
+    subject: `WBSC PBP Checker - automated check summary for ${association}`,
     html,
   }
 

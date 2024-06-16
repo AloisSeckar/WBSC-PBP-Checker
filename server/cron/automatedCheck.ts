@@ -1,13 +1,13 @@
 import { useDateFormat } from '@vueuse/core'
 import { defineCronHandler } from '#nuxt/cron'
 
-export default defineCronHandler(() => '0 6 * * MON', async () => {
-  console.log('[WBSC PBP Checker] starting weekly check @ ' + useDateFormat(new Date(), 'YYYY-MM-DD HH:mm:ss').value)
+export default defineCronHandler(() => useRuntimeConfig().public.automatedCheck, async () => {
+  console.log('[WBSC PBP Checker] starting automated check @ ' + useDateFormat(new Date(), 'YYYY-MM-DD HH:mm:ss').value)
 
   await autoCheckGames('baseball')
   await autoCheckGames('softball')
 
-  console.log('[WBSC PBP Checker] starting weekly check @ ' + useDateFormat(new Date(), 'YYYY-MM-DD HH:mm:ss').value)
+  console.log('[WBSC PBP Checker] starting automated check @ ' + useDateFormat(new Date(), 'YYYY-MM-DD HH:mm:ss').value)
 })
 
 async function autoCheckGames(variant: PBPVariant) {
