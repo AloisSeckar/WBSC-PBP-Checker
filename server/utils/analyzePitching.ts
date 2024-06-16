@@ -85,8 +85,7 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
     pitchingProblems.push('Data object `boxScore` not found')
   }
 
-  // export function analyzePitching(gamePlays: WBSCGamePlays, pitchers: WBSCPitchers, homePitchersData: WBSCPlayerStats[], awayPitchersData: WBSCPlayerStats[]): string[] {
-  init()
+  initPitcherAnalysis()
   homePitchersData.forEach(p => analysis.homePitchers.push(toPBPPitcherAnalysis(p)))
   analysis.currentHomePitcher = analysis.homePitchers.at(0)!
   analysis.currentHomePitcher.starting = true
@@ -150,14 +149,19 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   const winningTeamPitchers = isHomeLeading() ? analysis.homePitchers : analysis.awayPitchers
   const losingTeamPitchers = isHomeLeading() ? analysis.awayPitchers : analysis.homePitchers
 
+  // SP cannot get W, if he didn't throw enough innings
+  if (winningTeamPitchers.length > 1) {
+    const first = winningTeamPitchers.at(0)!
+    if (first.win && !checkEnoughInnings(first, innings, variant)) {
+      first.win = false
+      // TODO we should analyze the "most effective" RP
+      winningTeamPitchers.at(1)!.win = true
+    }
+  }
+
   const correctWin = winningTeamPitchers.find(p => p.win)!
   if (correctWin.id !== pitchers.win?.id) {
-    if (correctWin?.starting && !checkEnoughInnings(correctWin, innings, variant)) {
-      // TODO can we verify it is the best choice?
-      console.log('Starting pitcher has not enough IP => someone else was correctly chosen by the scorer')
-    } else {
-      pitchingProblems.push(`${correctWin?.fullName} should have W (${pitchers.win?.fullName} was scored)`)
-    }
+    pitchingProblems.push(`${correctWin?.fullName} should have W (${pitchers.win?.fullName} was scored)`)
   }
 
   const correctLoss = losingTeamPitchers.find(p => p.loss)!
@@ -165,10 +169,13 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
     pitchingProblems.push(`${correctLoss?.fullName} should have L (${pitchers.loss?.fullName} was scored)`)
   }
 
-  const last = winningTeamPitchers.at(-1)!
-  if (shouldHaveSave(last, correctWin.id)) {
-    if (last.id !== pitchers.save?.id) {
+  if (winningTeamPitchers.length > 1) {
+    const last = winningTeamPitchers.at(-1)!
+    const hasSave = shouldHaveSave(last, correctWin.id)
+    if (hasSave && last.id !== pitchers.save?.id) {
       pitchingProblems.push(`${last?.fullName} should have S (${pitchers.save?.fullName || 'N/A'} was scored)`)
+    } else if (!hasSave && pitchers.save) {
+      pitchingProblems.push(`No pitcher should have S (${pitchers.save.fullName} was scored)`)
     }
   }
 
@@ -274,7 +281,7 @@ function toPBPPitcherAnalysis(stats: WBSCPlayerStats): PBPPitcherAnalysis {
   }
 }
 
-function init() {
+function initPitcherAnalysis() {
   analysis.homePitchers.length = 0
   analysis.currentHomePitcher = undefined
   analysis.homePoints = 0
