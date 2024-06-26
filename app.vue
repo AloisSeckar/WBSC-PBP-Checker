@@ -18,7 +18,7 @@
     <h2 class="mb-4 text-2xl font-bold">
       Games to be checked
     </h2>
-    <div class="mb-2 flex flex-row gap-2 items-center">
+    <div v-if="useRuntimeConfig().public.adminVersion" class="mb-2 flex flex-row gap-2 items-center">
       Get links for:
       <USelect v-model="filterVariant" :options="variantOptions" />
       <USelect v-model="filterLeague" :options="leagueOptions" />

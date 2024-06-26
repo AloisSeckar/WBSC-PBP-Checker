@@ -21,6 +21,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     emailPassword: '',
     public: {
+      adminVersion: false,
       automatedCheck: '0 6 * * MON',
     },
   },

@@ -2,12 +2,16 @@ import { useDateFormat } from '@vueuse/core'
 import { defineCronHandler } from '#nuxt/cron'
 
 export default defineCronHandler(() => useRuntimeConfig().public.automatedCheck, async () => {
-  console.log('[WBSC PBP Checker] starting automated check @ ' + useDateFormat(new Date(), 'YYYY-MM-DD HH:mm:ss').value)
+  if (useRuntimeConfig().public.adminVersion) {
+    console.log('[WBSC PBP Checker] starting automated check @ ' + useDateFormat(new Date(), 'YYYY-MM-DD HH:mm:ss').value)
 
-  await autoCheckGames('baseball')
-  await autoCheckGames('softball')
+    await autoCheckGames('baseball')
+    await autoCheckGames('softball')
 
-  console.log('[WBSC PBP Checker] starting automated check @ ' + useDateFormat(new Date(), 'YYYY-MM-DD HH:mm:ss').value)
+    console.log('[WBSC PBP Checker] starting automated check @ ' + useDateFormat(new Date(), 'YYYY-MM-DD HH:mm:ss').value)
+  } else {
+    console.log('[WBSC PBP Checker] not running in admin mode => check skipped @ ' + useDateFormat(new Date(), 'YYYY-MM-DD HH:mm:ss').value)
+  }
 })
 
 async function autoCheckGames(variant: PBPVariant) {
