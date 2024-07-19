@@ -24,6 +24,13 @@ export default defineNuxtConfig({
     quiet: true,
   },
 
+  // TODO this temporary for investigating behavior on Netlify
+  vite: {
+    build: {
+      minify: false,
+    },
+  },
+
   runtimeConfig: {
     emailPassword: '',
     public: {
