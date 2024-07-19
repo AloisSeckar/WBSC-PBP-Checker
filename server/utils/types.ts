@@ -126,6 +126,7 @@ export type WBSCGamePlay = {
   playorder: number
   batterid: number
   pitcherid: number
+  pitch_pitches: number
   runs: number
   runner1: number
   runner2: number

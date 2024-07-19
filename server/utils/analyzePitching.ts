@@ -45,6 +45,7 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
           pitchingProblems.push('Winning pitcher doesn\'t have any IP')
         }
         // starter must have enough innings
+        // TODO - we can't guess starting pitcher from "sub" property (see line 100 and on)
         if (winPitcher.sub === 0 && !checkEnoughInnings(winPitcher, innings, variant)) {
           pitchingProblems.push('Starting pitcher doesn\'t have enough IP to get the win')
         }
@@ -93,7 +94,54 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   analysis.currentAwayPitcher = analysis.awayPitchers.at(0)!
   analysis.currentAwayPitcher.starting = true
 
+  // go through all recorded plays
   const gamePlays = appData.gamePlays.all
+
+  // test games
+  // https://czechsoftball.wbsc.org/cs/events/extraliga-mu-2024/schedule-and-results/box-score/141458
+  // https://czechsoftball.wbsc.org/cs/events/extraliga-mu-2024/schedule-and-results/box-score/141462
+
+  // there could be pitching change before first pitch
+  // if so, starting pitcher needs to be changed
+  // lets find first play with "pitch_pitches: 1" (first pitch actually thrown) and check its "pitcherid"
+  // there can be uknown number of "technical" plays (substitutions, comments, etc.) prior to it
+  let firstAwayPlay
+  let i = 0
+  do {
+    firstAwayPlay = gamePlays['1'].top.at(i++)
+  } while (!firstAwayPlay || firstAwayPlay.pitch_pitches < 1)
+
+  const homeStarter = firstAwayPlay.pitcherid
+  if (homeStarter !== analysis.currentHomePitcher.id) {
+    analysis.currentHomePitcher.starting = false
+    const actualHomeStarter = analysis.homePitchers.find(p => p.id === homeStarter)
+    if (actualHomeStarter) {
+      actualHomeStarter.starting = true
+      console.log(`HOME starting pitcher changed - ${actualHomeStarter.pbpName} threw first pitch`)
+    } else {
+      pitchingProblems.push(`Home starting pitcher with ID ${homeStarter} not found in data`)
+    }
+  }
+
+  // although less common, away starting pitcher may also change at the begining of the bottom 1st
+  let firstHomePlay
+  i = 0
+  do {
+    firstHomePlay = gamePlays['1'].bot.at(i++)
+  } while (!firstHomePlay || firstHomePlay.pitch_pitches < 1)
+
+  const awayStarter = firstHomePlay.pitcherid
+  if (awayStarter !== analysis.currentAwayPitcher.id) {
+    analysis.currentAwayPitcher.starting = false
+    const actualAwayStarter = analysis.awayPitchers.find(p => p.id === awayStarter)
+    if (actualAwayStarter) {
+      actualAwayStarter.starting = true
+      console.log(`AWAY starting pitcher changed - ${actualAwayStarter.pbpName} threw first pitch`)
+    } else {
+      pitchingProblems.push(`Home starting pitcher with ID ${awayStarter} not found in data`)
+    }
+  }
+
   for (const inn in gamePlays) {
     gamePlays[inn].top?.forEach((play) => {
       // handle scoring plays
