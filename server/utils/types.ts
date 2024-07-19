@@ -66,6 +66,7 @@ export type WBSCScorer = {
 }
 
 export type WBSCAssignment = {
+  type: number
   person: WBSCScorer
 }
 

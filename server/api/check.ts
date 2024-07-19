@@ -62,7 +62,9 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
             console.log(gameData.assignments)
             const scorers: string[] = []
             gameData.assignments.forEach((a) => {
-              scorers.push(a.person?.label || 'UNKNOWN')
+              if (a.type === 1) { // 0 = Umpires, 1 = scorers, 2 = TCs
+                scorers.push(a.person?.label || 'UNKNOWN')
+              }
             })
             gameScorer = scorers.join(', ')
             console.log(gameScorer)
