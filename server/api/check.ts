@@ -1,5 +1,4 @@
 import { parse } from 'node-html-parser'
-import puppeteer from 'puppeteer'
 
 export default defineEventHandler(async (event): Promise<PBPCheck> => {
   const body = await readBody(event) as PBPGameCheckRequest
@@ -7,7 +6,6 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
 
   const games: PBPGameCheck[] = []
 
-  const browser = await puppeteer.launch()
   for (const gameLink of gameLinks) {
     const problems: string[] = []
 
@@ -17,16 +15,10 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
     let appData
     let gamePlays: WBSCGamePlays
     try {
-      // the page is client-generated => it requires headless browser to render it
+      const pbpHTMLData = await $fetch<string>(gameLink)
+      const pbpHTMLPage = parse(pbpHTMLData)
 
-      // use Puppeteer to navigate to page
-
-      const page = await browser.newPage()
-      await page.goto(gameLink)
-
-      const pbpHTMLData = await page.content()
-      const pbpPage1 = parse(pbpHTMLData)
-      const app = pbpPage1.querySelector('#app')
+      const app = pbpHTMLPage.querySelector('#app')
       const appDataString = app?.attrs['data-page']
       if (appDataString) {
         appData = JSON.parse(appDataString).props.viewData.original as WBSCAppData
@@ -133,7 +125,6 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
       problems,
     })
   }
-  browser.close()
 
   // return JSON data
   return {

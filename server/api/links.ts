@@ -2,6 +2,10 @@ import type { Page } from 'puppeteer'
 import puppeteer from 'puppeteer'
 
 export default defineEventHandler(async (event): Promise<string[]> => {
+  if (!import.meta.dev) {
+    return ['Function is currently not available because `puppeteer` doesn\'t work with Netlify hosting']
+  }
+
   const gameLinks: string[] = []
 
   const browser = await puppeteer.launch()
