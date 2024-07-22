@@ -1,4 +1,4 @@
-import type { PBPGameAnalysis, PBPPitcherAnalysis, WBSCGamePlay } from './types'
+import type { PBPGameAnalysis, PBPPitcherAnalysis, PBPPitchingAnalysis, WBSCGamePlay } from './types'
 
 const analysis: PBPPitchingAnalysis = {
   homePitchers: [],
@@ -19,71 +19,20 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   const homePitchersData: WBSCPlayerStats[] = []
   const awayPitchersData: WBSCPlayerStats[] = []
   const boxScore = appData.boxScore
-  if (boxScore) {
-    const homeStats = boxScore[homeTeamId] as WBSCStats
-    homePitchersData.push(...homeStats['90'])
-    if (homePitchersData.length < 1) {
-      pitchingProblems.push('Stats data for `homePitchers` not found')
-    }
-    const awayStats = boxScore[awayTeamId] as WBSCStats
-    awayPitchersData.push(...awayStats['90'])
-    if (awayPitchersData.length < 1) {
-      pitchingProblems.push('Stats data for `awayPitchers` not found')
-    }
-    const pitcherRecords = [...homePitchersData, ...awayPitchersData]
-
-    const pitchers = boxScore.pitchers
-    if (pitchers) {
-      if (pitchers.win) {
-        const winPitcher = findPitcher(pitchers.win.id, pitcherRecords)!
-        // must be correct team
-        if (!checkCorrectTeam(winPitcher, winner === 'home' ? homeTeamId : awayTeamId)) {
-          pitchingProblems.push('Winning pitcher is from losing team')
-        }
-        // must have at least 0.1 IP
-        if (winPitcher.pitch_ip === '0.0') {
-          pitchingProblems.push('Winning pitcher doesn\'t have any IP')
-        }
-        // starter must have enough innings
-        // TODO - we can't guess starting pitcher from "sub" property (see line 100 and on)
-        if (winPitcher.sub === 0 && !checkEnoughInnings(winPitcher, innings, variant)) {
-          pitchingProblems.push('Starting pitcher doesn\'t have enough IP to get the win')
-        }
-        console.log(winPitcher?.firstname + ' ' + winPitcher?.lastname)
-      } else {
-        pitchingProblems.push('Winning pitcher not set')
-      }
-      if (pitchers.loss) {
-        const lossPitcher = findPitcher(pitchers.loss.id, pitcherRecords)!
-        // must be correct team
-        if (!checkCorrectTeam(lossPitcher, winner === 'home' ? awayTeamId : homeTeamId)) {
-          pitchingProblems.push('Winning pitcher is from losing team')
-        }
-        // must have at least 0.1 IP
-        if (lossPitcher.pitch_ip === '0.0') {
-          pitchingProblems.push('Losing pitcher doesn\'t have any IP')
-        }
-        console.log(lossPitcher?.firstname + ' ' + lossPitcher?.lastname)
-      } else {
-        pitchingProblems.push('Losing pitcher not set')
-      }
-      if (pitchers.save) {
-        const savePitcher = findPitcher(pitchers.save.id, pitcherRecords)!
-        // must be correct team
-        if (!checkCorrectTeam(savePitcher, winner === 'home' ? homeTeamId : awayTeamId)) {
-          pitchingProblems.push('Winning pitcher is from losing team')
-        }
-        // must have at least 0.1 IP
-        if (savePitcher.pitch_ip === '0.0') {
-          pitchingProblems.push('Save pitcher doesn\'t have any IP')
-        }
-        console.log(savePitcher?.firstname + ' ' + savePitcher?.lastname)
-      }
-    } else {
-      pitchingProblems.push('Data object `pitchers` not found')
-    }
-  } else {
+  if (!boxScore) {
     pitchingProblems.push('Data object `boxScore` not found')
+    return pitchingProblems
+  }
+
+  const homeStats = boxScore[homeTeamId] as WBSCStats
+  homePitchersData.push(...homeStats['90'])
+  if (homePitchersData.length < 1) {
+    pitchingProblems.push('Stats data for `homePitchers` not found')
+  }
+  const awayStats = boxScore[awayTeamId] as WBSCStats
+  awayPitchersData.push(...awayStats['90'])
+  if (awayPitchersData.length < 1) {
+    pitchingProblems.push('Stats data for `awayPitchers` not found')
   }
 
   initPitcherAnalysis()
@@ -96,10 +45,6 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
 
   // go through all recorded plays
   const gamePlays = appData.gamePlays.all
-
-  // test games
-  // https://czechsoftball.wbsc.org/cs/events/extraliga-mu-2024/schedule-and-results/box-score/141458
-  // https://czechsoftball.wbsc.org/cs/events/extraliga-mu-2024/schedule-and-results/box-score/141462
 
   // there could be pitching change before first pitch
   // if so, starting pitcher needs to be changed
@@ -161,7 +106,7 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
       if (play.narrative.includes('Pitching Change')) {
         console.log(play.narrative)
         const nextPlay = getNextPlay(gamePlays[inn].top, play.playorder)
-        changePitcher(play.narrative, nextPlay, true)
+        changePitcher(play.narrative, nextPlay)
       }
     })
     gamePlays[inn].bot?.forEach((play) => {
@@ -182,7 +127,7 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
       if (play.narrative.includes('Pitching Change')) {
         console.log(play.narrative)
         const nextPlay = getNextPlay(gamePlays[inn].bot, play.playorder)
-        changePitcher(play.narrative, nextPlay, false)
+        changePitcher(play.narrative, nextPlay)
       }
     })
   }
@@ -192,19 +137,59 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
 
   // confront analysis with scored results
 
-  const pitchers = appData.boxScore.pitchers
-
-  const winningTeamPitchers = isHomeLeading() ? analysis.homePitchers : analysis.awayPitchers
-  const losingTeamPitchers = isHomeLeading() ? analysis.awayPitchers : analysis.homePitchers
+  const winningTeamPitchers = winner === 'home' ? analysis.homePitchers : analysis.awayPitchers
+  const losingTeamPitchers = winner === 'home' ? analysis.awayPitchers : analysis.homePitchers
 
   // SP cannot get W, if he didn't throw enough innings
   if (winningTeamPitchers.length > 1) {
-    const first = winningTeamPitchers.at(0)!
-    if (first.win && !checkEnoughInnings(first, innings, variant)) {
-      first.win = false
+    const starter = winningTeamPitchers.find(p => p.starting)!
+    if (starter.win && !checkEnoughInnings(starter, innings, variant)) {
+      starter.win = false
       // TODO we should analyze the "most effective" RP
-      winningTeamPitchers.at(1)!.win = true
+      winningTeamPitchers.filter(p => !p.starting).at(0)!.win = true
     }
+  }
+
+  const pitchers = boxScore.pitchers
+  if (!pitchers) {
+    pitchingProblems.push('Data object `pitchers` not found')
+  }
+
+  if (pitchers.win) {
+    const winPitcher = findPitcher(pitchers.win.id, winner === 'home' ? analysis.homePitchers : analysis.awayPitchers)!
+    // must be correct team
+    if (!checkCorrectTeam(winPitcher, winner === 'home' ? homeTeamId : awayTeamId)) {
+      pitchingProblems.push('Winning pitcher is from losing team')
+    }
+    // starter must have enough innings
+    if (winPitcher.starting && !checkEnoughInnings(winPitcher, innings, variant)) {
+      pitchingProblems.push('Starting pitcher doesn\'t have enough IP to get the win')
+    }
+    console.log(winPitcher.fullName)
+  } else {
+    pitchingProblems.push('Winning pitcher not set')
+  }
+  if (pitchers.loss) {
+    const lossPitcher = findPitcher(pitchers.loss.id, winner === 'away' ? analysis.homePitchers : analysis.awayPitchers)!
+    // must be correct team
+    if (!checkCorrectTeam(lossPitcher, winner === 'home' ? awayTeamId : homeTeamId)) {
+      pitchingProblems.push('Winning pitcher is from losing team')
+    }
+    console.log(lossPitcher.fullName)
+  } else {
+    pitchingProblems.push('Losing pitcher not set')
+  }
+  if (pitchers.save) {
+    const savePitcher = findPitcher(pitchers.save.id, winner === 'home' ? analysis.homePitchers : analysis.awayPitchers)!
+    // must be correct team
+    if (!checkCorrectTeam(savePitcher, winner === 'home' ? homeTeamId : awayTeamId)) {
+      pitchingProblems.push('Winning pitcher is from losing team')
+    }
+    // must have at least 0.1 IP
+    if (savePitcher.pitch_ip === '0.0') {
+      pitchingProblems.push('Save pitcher doesn\'t have any IP')
+    }
+    console.log(savePitcher.fullName)
   }
 
   const correctWin = winningTeamPitchers.find(p => p.win)!
@@ -294,20 +279,21 @@ function clearWLS() {
   })
 }
 
-function changePitcher(play: string, nextPlay: WBSCGamePlay, home: boolean) {
-  const subInfo = play.split(' ')
-  const newPitcher = `${subInfo[2]} ${subInfo[3]}`
-  if (home) {
-    analysis.homePitchers.forEach((p) => {
-      if (p.pbpName === newPitcher) {
-        analysis.currentHomePitcher = p
-        analysis.currentHomePitcher.canHaveSave = isHomeLeading() && isCloseGame(nextPlay)
-        analysis.currentHomePitcher.canHaveSave3 = isHomeLeading() && analysis.homePoints - analysis.awayPoints <= 3
-      }
-    })
-  } else {
+function changePitcher(play: string, nextPlay: WBSCGamePlay) {
+  const newPitcherName = play.match(/:\s(#\d\d?\s.+)\sfor/)?.[1]
+
+  let found: boolean = false
+  analysis.homePitchers.forEach((p) => {
+    if (p.pbpName === newPitcherName) {
+      found = true
+      analysis.currentHomePitcher = p
+      analysis.currentHomePitcher.canHaveSave = isHomeLeading() && isCloseGame(nextPlay)
+      analysis.currentHomePitcher.canHaveSave3 = isHomeLeading() && analysis.homePoints - analysis.awayPoints <= 3
+    }
+  })
+  if (!found) {
     analysis.awayPitchers.forEach((p) => {
-      if (p.pbpName === newPitcher) {
+      if (p.pbpName === newPitcherName) {
         analysis.currentAwayPitcher = p
         analysis.currentAwayPitcher.canHaveSave = isAwayLeading() && isCloseGame(nextPlay)
         analysis.currentAwayPitcher.canHaveSave3 = isAwayLeading() && analysis.awayPoints - analysis.homePoints <= 3
@@ -323,6 +309,7 @@ function getNextPlay(plays: WBSCGamePlay[], order: number) {
 function toPBPPitcherAnalysis(stats: WBSCPlayerStats): PBPPitcherAnalysis {
   return {
     id: stats.playerid,
+    teamId: stats.teamid,
     pbpName: `#${stats.uniform} ${stats.lastname}`,
     fullName: `${stats.lastname} ${stats.firstname}`,
     pitch_ip: stats.pitch_ip,

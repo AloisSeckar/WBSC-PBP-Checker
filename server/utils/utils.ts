@@ -1,9 +1,9 @@
-export function findPitcher(playerId: number, pitchers: WBSCPlayerStats[]) {
-  return pitchers?.find((p: WBSCPlayerStats) => p.playerid === playerId)
+export function findPitcher(playerId: number, pitchers: PBPPitcherAnalysis[]) {
+  return pitchers?.find((p: PBPPitcherAnalysis) => p.id === playerId)
 }
 
-export function checkCorrectTeam(pitcher: WBSCPlayerStats, teamId: number) {
-  return pitcher.teamid === teamId
+export function checkCorrectTeam(pitcher: PBPPitcherAnalysis, teamId: number) {
+  return pitcher.teamId === teamId
 }
 
 export function checkEnoughInnings(pitcher: { pitch_ip: string }, innings: number, variant: string) {

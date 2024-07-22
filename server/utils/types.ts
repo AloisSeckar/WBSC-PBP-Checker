@@ -34,6 +34,7 @@ export type PBPGameAnalysis = {
 
 export type PBPPitcherAnalysis = {
   id: number
+  teamId: number
   pbpName: string
   fullName: string
   pitch_ip: string
