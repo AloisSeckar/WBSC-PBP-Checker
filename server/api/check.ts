@@ -89,8 +89,15 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
           problems.push(...pitchingProblems)
         }
 
-        // analyze batting / fielding
         gamePlays = appData.gamePlays.all
+
+        // analyze earned runs
+        const runProblems = analyzeEarnedRuns(gamePlays)
+        if (runProblems.length > 0) {
+          problems.push(...runProblems)
+        }
+
+        // analyze batting / fielding // TODO refactor to separate check
         if (gamePlays) {
           // cycle through plays
           const innings = Object.keys(gamePlays).map(p => parseInt(p))
