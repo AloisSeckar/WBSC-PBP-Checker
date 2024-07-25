@@ -19,11 +19,6 @@ export default defineNuxtConfig({
     },
   },
 
-  // TODO remove later https://github.com/nuxt-modules/tailwindcss/releases/tag/v6.12.0
-  tailwindcss: {
-    quiet: true,
-  },
-
   runtimeConfig: {
     emailPassword: '',
     public: {
