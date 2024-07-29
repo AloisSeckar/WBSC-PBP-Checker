@@ -92,10 +92,11 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
         gamePlays = appData.gamePlays.all
 
         // analyze earned runs
-        const runProblems = analyzeEarnedRuns(gamePlays)
-        if (runProblems.length > 0) {
-          problems.push(...runProblems)
-        }
+        // TODO for now not working as intended - fix or remove
+        // const runProblems = analyzeEarnedRuns(gamePlays)
+        // if (runProblems.length > 0) {
+        //   problems.push(...runProblems)
+        // }
 
         // analyze batting / fielding // TODO refactor to separate check
         if (gamePlays) {
