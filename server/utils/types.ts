@@ -39,6 +39,7 @@ export type PBPPitcherAnalysis = {
   fullName: string
   pitch_ip: string
   starting?: boolean
+  finishing?: boolean
   win?: boolean
   loss?: boolean
   canHaveSave?: boolean // when entering the game, score is close

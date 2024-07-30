@@ -39,9 +39,11 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   homePitchersData.forEach(p => analysis.homePitchers.push(toPBPPitcherAnalysis(p)))
   analysis.currentHomePitcher = analysis.homePitchers.at(0)!
   analysis.currentHomePitcher.starting = true
+  analysis.currentHomePitcher.finishing = true
   awayPitchersData.forEach(p => analysis.awayPitchers.push(toPBPPitcherAnalysis(p)))
   analysis.currentAwayPitcher = analysis.awayPitchers.at(0)!
   analysis.currentAwayPitcher.starting = true
+  analysis.currentAwayPitcher.finishing = true
 
   // go through all recorded plays
   const gamePlays = appData.gamePlays.all
@@ -59,9 +61,11 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   const homeStarter = firstAwayPlay.pitcherid
   if (homeStarter !== analysis.currentHomePitcher.id) {
     analysis.currentHomePitcher.starting = false
+    analysis.currentHomePitcher.finishing = false
     const actualHomeStarter = analysis.homePitchers.find(p => p.id === homeStarter)
     if (actualHomeStarter) {
       actualHomeStarter.starting = true
+      actualHomeStarter.finishing = true
       console.log(`HOME starting pitcher changed - ${actualHomeStarter.pbpName} threw first pitch`)
     } else {
       pitchingProblems.push(`Home starting pitcher with ID ${homeStarter} not found in data`)
@@ -78,9 +82,11 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   const awayStarter = firstHomePlay.pitcherid
   if (awayStarter !== analysis.currentAwayPitcher.id) {
     analysis.currentAwayPitcher.starting = false
+    analysis.currentAwayPitcher.finishing = false
     const actualAwayStarter = analysis.awayPitchers.find(p => p.id === awayStarter)
     if (actualAwayStarter) {
       actualAwayStarter.starting = true
+      actualAwayStarter.finishing = true
       console.log(`AWAY starting pitcher changed - ${actualAwayStarter.pbpName} threw first pitch`)
     } else {
       pitchingProblems.push(`Home starting pitcher with ID ${awayStarter} not found in data`)
@@ -203,7 +209,7 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   }
 
   if (winningTeamPitchers.length > 1) {
-    const last = winningTeamPitchers.at(-1)!
+    const last = winningTeamPitchers.find(p => p.finishing)!
     const hasSave = shouldHaveSave(last, correctWin.id)
     if (hasSave && last.id !== pitchers.save?.id) {
       pitchingProblems.push(`${last?.fullName} should have S (${pitchers.save?.fullName || 'N/A'} was scored)`)
@@ -286,7 +292,9 @@ function changePitcher(play: string, nextPlay: WBSCGamePlay) {
   analysis.homePitchers.forEach((p) => {
     if (p.pbpName === newPitcherName) {
       found = true
+      analysis.currentHomePitcher!.finishing = false
       analysis.currentHomePitcher = p
+      analysis.currentHomePitcher.finishing = true
       analysis.currentHomePitcher.canHaveSave = isHomeLeading() && isCloseGame(nextPlay)
       analysis.currentHomePitcher.canHaveSave3 = isHomeLeading() && analysis.homePoints - analysis.awayPoints <= 3
     }
@@ -294,7 +302,9 @@ function changePitcher(play: string, nextPlay: WBSCGamePlay) {
   if (!found) {
     analysis.awayPitchers.forEach((p) => {
       if (p.pbpName === newPitcherName) {
+        analysis.currentAwayPitcher!.finishing = false
         analysis.currentAwayPitcher = p
+        analysis.currentAwayPitcher.finishing = true
         analysis.currentAwayPitcher.canHaveSave = isAwayLeading() && isCloseGame(nextPlay)
         analysis.currentAwayPitcher.canHaveSave3 = isAwayLeading() && analysis.awayPoints - analysis.homePoints <= 3
       }
