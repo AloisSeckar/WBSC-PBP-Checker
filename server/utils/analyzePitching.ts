@@ -19,10 +19,6 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   const homePitchersData: WBSCPlayerStats[] = []
   const awayPitchersData: WBSCPlayerStats[] = []
   const boxScore = appData.boxScore
-  if (!boxScore) {
-    pitchingProblems.push('Data object `boxScore` not found')
-    return pitchingProblems
-  }
 
   const homeStats = boxScore[homeTeamId] as WBSCStats
   homePitchersData.push(...homeStats['90'])
@@ -157,10 +153,6 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   }
 
   const pitchers = boxScore.pitchers
-  if (!pitchers) {
-    pitchingProblems.push('Data object `pitchers` not found')
-  }
-
   if (pitchers.win) {
     const winPitcher = findPitcher(pitchers.win.id, winner === 'home' ? analysis.homePitchers : analysis.awayPitchers)!
     // must be correct team
