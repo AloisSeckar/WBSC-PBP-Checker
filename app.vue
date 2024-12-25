@@ -67,7 +67,7 @@ const variantOptions = ['', 'baseball', 'softball']
 const filterMonth = ref('all')
 const monthOptions = ['all', '04', '05', '06', '07', '08', '09', '10']
 
-const filterYear = '2024'
+const filterYear = ref('2024')
 const yearOptions = ['2024']
 
 const filterLeague = ref('')
@@ -94,7 +94,7 @@ async function getLinks() {
         variant: filterVariant.value,
         league: filterLeague.value,
         month: filterMonth.value !== 'all' ? filterMonth.value : '',
-        year: filterMonth.value !== 'all' ? filterYear : '',
+        year: filterMonth.value !== 'all' ? filterYear.value : '',
       },
     })
     console.debug(data)
