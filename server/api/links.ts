@@ -8,7 +8,10 @@ export default defineEventHandler(async (event): Promise<string[]> => {
 
   const gameLinks: string[] = []
 
-  const browser = await puppeteer.launch()
+  const browser = await puppeteer.launch({
+    executablePath: useRuntimeConfig().public.chromium,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  })
 
   const query = getQuery(event)
 

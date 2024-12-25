@@ -4,7 +4,10 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
   const body = await readBody(event) as PBPGameCheckRequest
   const gameLinks = body?.gameLinks
 
-  const browser = await puppeteer.launch()
+  const browser = await puppeteer.launch({
+    executablePath: useRuntimeConfig().public.chromium,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  })
   const gamePage = await browser.newPage()
 
   const games: PBPGameCheck[] = []

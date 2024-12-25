@@ -4,7 +4,8 @@
     "eslint": "eslint .",
     "dev": "nuxt dev",
     "build": "nuxt build",
-    "start": "nuxt preview"
+    "start": "nuxt preview",
+    "postinstall": "npx puppeteer install --path ./.cache/puppeteer"
   },
   "devDependencies": {
     "nuxt-ignis": "0.1.6",

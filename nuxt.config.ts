@@ -11,6 +11,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     emailPassword: '',
     public: {
+      chromium: '/opt/bin/chromium',
       adminVersion: false,
       automatedCheck: '0 6 * * MON',
     },
