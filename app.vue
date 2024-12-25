@@ -46,7 +46,7 @@
         for more info and contact
       </div>
       <div>
-        The website is powered by <a href="https://nuxt.com/" class="text-blue-600 hover:text-blue-400">Nuxt</a>
+        The website is powered by <a href="https://github.com/AloisSeckar/nuxt-ignis" class="text-blue-600 hover:text-blue-400">Nuxt Ignis</a>
       </div>
     </footer>
   </div>
