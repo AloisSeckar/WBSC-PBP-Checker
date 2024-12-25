@@ -1,8 +1,11 @@
-import { parse } from 'node-html-parser'
+import puppeteer from 'puppeteer'
 
 export default defineEventHandler(async (event): Promise<PBPCheck> => {
   const body = await readBody(event) as PBPGameCheckRequest
   const gameLinks = body?.gameLinks
+
+  const browser = await puppeteer.launch()
+  const gamePage = await browser.newPage()
 
   const games: PBPGameCheck[] = []
 
@@ -15,13 +18,12 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
     let appData
     let gamePlays: WBSCGamePlays
     try {
-      const pbpHTMLData = await $fetch<string>(gameLink)
-      const pbpHTMLPage = parse(pbpHTMLData)
+      await gamePage.goto(gameLink)
+      await gamePage.waitForSelector('#app')
+      const rawData = await gamePage.$eval('#app', el => el.getAttribute('data-page'))
+      appData = JSON.parse(rawData).props.viewData.original as WBSCAppData
 
-      const app = pbpHTMLPage.querySelector('#app')
-      const appDataString = app?.attrs['data-page']
-      if (appDataString) {
-        appData = JSON.parse(appDataString).props.viewData.original as WBSCAppData
+      if (appData) {
         // analyze input data
         const inputProblems = analyzeInput(appData)
         if (inputProblems.length > 0) {

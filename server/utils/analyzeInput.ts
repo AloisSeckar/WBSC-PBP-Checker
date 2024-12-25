@@ -15,7 +15,7 @@ export function analyzeInput(appData: WBSCAppData): string[] {
       issues.push('Data object `boxScore` not found')
     }
 
-    if (!appData.boxScore.pitchers) {
+    if (!appData.boxScore?.pitchers) {
       issues.push('Data object `boxScore.pitchers` not found')
     }
 
@@ -23,13 +23,13 @@ export function analyzeInput(appData: WBSCAppData): string[] {
       issues.push('Data object `gameData` not found')
     }
 
-    if (!appData.gameData.assignments) {
+    if (!appData.gameData?.assignments) {
       issues.push('Data object `gameData.assignments` not found')
     }
 
-    if (!appData.gamePlays.all) {
+    if (!appData.gamePlays?.all) {
       issues.push('Data object `gameData.gamePlays.all` not found')
-    } else if (Object.keys(appData.gamePlays.all).length === 0) {
+    } else if (Object.keys(appData.gamePlays?.all).length === 0) {
       return ['Data object `gameData.gamePlays.all` contains no entries']
     }
   } else {
