@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/screenshot.js": {
+      "includeFiles": "chrome/linux-*/chrome-linux64/**"
+    }
+  }
+}
