@@ -5,7 +5,7 @@
     "dev": "nuxt dev",
     "build": "nuxt build",
     "start": "nuxt preview",
-    "postinstall": "npx puppeteer install --path ./.cache/puppeteer"
+    "postinstall": "npx @puppeteer/browsers install chrome@stable"
   },
   "devDependencies": {
     "nuxt-ignis": "0.1.6",
