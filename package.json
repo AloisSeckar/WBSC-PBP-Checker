@@ -10,7 +10,9 @@
     "@types/nodemailer": "6.4.17",
     "nodemailer": "6.9.16",
     "nuxt-cron": "1.7.0",
-    "nuxt-ignis": "0.1.6"
+    "nuxt-ignis": "0.1.6",
+    "vue": "latest",
+    "vue-router": "latest"
   },
   "dependencies": {
     "@sparticuz/chromium": "131.0.1",
