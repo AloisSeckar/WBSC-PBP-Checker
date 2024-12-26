@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "index.mjs": {
-      "includeFiles": "chrome/linux-*/chrome-linux64/**"
-    }
-  }
-}

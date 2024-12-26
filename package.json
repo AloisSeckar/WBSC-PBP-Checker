@@ -4,18 +4,16 @@
     "eslint": "eslint .",
     "dev": "nuxt dev",
     "build": "nuxt build",
-    "start": "nuxt preview",
-    "postinstall": "npx @puppeteer/browsers install chrome@stable"
+    "start": "nuxt preview"
   },
   "devDependencies": {
     "@types/nodemailer": "6.4.17",
     "nodemailer": "6.9.16",
     "nuxt-cron": "1.7.0",
-    "nuxt-ignis": "0.1.6",
-    "puppeteer": "23.11.1"
+    "nuxt-ignis": "0.1.6"
   },
   "dependencies": {
-    "@sparticuz/chromium": "^131.0.1",
-    "puppeteer-core": "^23.11.1"
+    "@sparticuz/chromium": "131.0.1",
+    "puppeteer-core": "23.11.1"
   }
 }
