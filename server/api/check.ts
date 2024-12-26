@@ -1,12 +1,14 @@
-import puppeteer from 'puppeteer'
+import chromium from '@sparticuz/chromium'
+import puppeteer from 'puppeteer-core'
 
 export default defineEventHandler(async (event): Promise<PBPCheck> => {
   const body = await readBody(event) as PBPGameCheckRequest
   const gameLinks = body?.gameLinks
 
+  const executablePath = await chromium.executablePath()
   const browser = await puppeteer.launch({
-    executablePath: useRuntimeConfig().public.chromium,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: chromium.args,
+    executablePath,
   })
   const gamePage = await browser.newPage()
 
