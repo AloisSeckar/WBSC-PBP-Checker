@@ -1,16 +1,15 @@
-import type { Page } from 'puppeteer'
-import puppeteer from 'puppeteer'
+import chromium from '@sparticuz/chromium'
+import type { Page } from 'puppeteer-core'
+import puppeteer from 'puppeteer-core'
 
 export default defineEventHandler(async (event): Promise<string[]> => {
-  if (!import.meta.dev) {
-    return ['Function is currently not available because `puppeteer` doesn\'t work with Netlify hosting']
-  }
-
   const gameLinks: string[] = []
 
+  const executablePath = await chromium.executablePath()
   const browser = await puppeteer.launch({
-    executablePath: useRuntimeConfig().public.chromium,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: chromium.args,
+    executablePath,
+    headless: true,
   })
 
   const query = getQuery(event)

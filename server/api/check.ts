@@ -9,6 +9,7 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
   const browser = await puppeteer.launch({
     args: chromium.args,
     executablePath,
+    headless: true,
   })
   const gamePage = await browser.newPage()
 
