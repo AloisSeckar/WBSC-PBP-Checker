@@ -6,14 +6,13 @@
     "build": "nuxt build",
     "start": "nuxt preview"
   },
-  "devDependencies": {
-    "@types/nodemailer": "6.4.17",
-    "nodemailer": "6.9.16",
-    "nuxt-cron": "1.7.0",
-    "nuxt-ignis": "0.1.6"
-  },
   "dependencies": {
-    "@sparticuz/chromium": "131.0.1",
-    "puppeteer-core": "23.11.1"
-  }
+    "@sparticuz/chromium": "^143.0.0",
+    "@types/nodemailer": "^7.0.0",
+    "nodemailer": "^7.0.0",
+    "nuxt-cron": "1.8.0",
+    "nuxt-ignis": "0.5.3",
+    "puppeteer-core": "^24.0.0"
+  },
+  "packageManager": "pnpm@10.28.2"
 }

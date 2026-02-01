@@ -5,7 +5,7 @@ import puppeteer from 'puppeteer-core'
 export default defineEventHandler(async (event): Promise<string[]> => {
   const gameLinks: string[] = []
 
-  const executablePath = await chromium.executablePath()
+  const executablePath = import.meta.dev ? useRuntimeConfig().public.chromium as string : await chromium.executablePath()
   const browser = await puppeteer.launch({
     args: chromium.args,
     executablePath,

@@ -5,7 +5,7 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
   const body = await readBody(event) as PBPGameCheckRequest
   const gameLinks = body?.gameLinks
 
-  const executablePath = await chromium.executablePath()
+  const executablePath = import.meta.dev ? useRuntimeConfig().public.chromium as string : await chromium.executablePath()
   const browser = await puppeteer.launch({
     args: chromium.args,
     executablePath,

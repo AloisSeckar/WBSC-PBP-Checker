@@ -20,17 +20,17 @@
     </h2>
     <div v-if="useRuntimeConfig().public.adminVersion" class="mb-2 flex flex-row gap-2 items-center">
       Get links for:
-      <USelect v-model="filterVariant" :options="variantOptions" />
-      <USelect v-model="filterLeague" :options="leagueOptions" />
+      <USelect v-model="filterVariant" :items="variantOptions" class="w-24" />
+      <USelect v-model="filterLeague" :items="leagueOptions" class="w-20" />
       in
-      <USelect v-model="filterMonth" :options="monthOptions" />
-      <USelect v-model="filterYear" :options="yearOptions" disabled />
+      <USelect v-model="filterMonth" :items="monthOptions" class="w-20" />
+      <USelect v-model="filterYear" :items="yearOptions" class="w-20" />
       <UButton @click="getLinks">
         Get links
       </UButton>
     </div>
     <div class="mb-2">
-      <UTextarea id="games" v-model="gamesText" :rows="10" />
+      <UTextarea id="games" v-model="gamesText" :rows="6" class="w-full" />
     </div>
     <UButton @click="check">
       Check games
@@ -54,21 +54,20 @@
 
 <script setup lang="ts">
 import { useIntervalFn } from '@vueuse/core'
-import type { PBPCheck } from './server/utils/types'
 
 const loading = ref(false)
 
 const gamesText = ref('')
 const gamesArray = computed(() => gamesText.value.split('\n'))
 
-const filterVariant = ref('')
-const variantOptions = ['', 'baseball', 'softball']
+const filterVariant = ref('softball')
+const variantOptions = ['baseball', 'softball']
 
 const filterMonth = ref('all')
 const monthOptions = ['all', '04', '05', '06', '07', '08', '09', '10']
 
-const filterYear = ref('2024')
-const yearOptions = ['2024']
+const filterYear = ref('2025')
+const yearOptions = ['2024', '2025']
 
 const filterLeague = ref('')
 const leagueOptions = computed(() => {
@@ -85,7 +84,7 @@ const leagueOptions = computed(() => {
 async function getLinks() {
   if (filterVariant.value && filterLeague.value) {
     gamesText.value = ''
-    pbpCheckData.value = {}
+    pbpCheckData.value = undefined
     showPending(true)
     console.debug(filterVariant.value, filterLeague.value)
     const data = await $fetch<string[]>('/api/links', {
@@ -103,9 +102,9 @@ async function getLinks() {
   }
 }
 
-const pbpCheckData = ref({})
+const pbpCheckData = ref<PBPCheck | undefined>(undefined)
 async function check() {
-  pbpCheckData.value = {}
+  pbpCheckData.value = undefined
   showPending(true)
   console.debug(gamesArray.value)
   const data = await $fetch<PBPCheck>('/api/check', {

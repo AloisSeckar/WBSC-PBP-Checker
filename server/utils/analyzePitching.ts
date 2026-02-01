@@ -1,5 +1,3 @@
-import type { PBPGameAnalysis, PBPPitcherAnalysis, PBPPitchingAnalysis, WBSCGamePlay } from './types'
-
 const analysis: PBPPitchingAnalysis = {
   homePitchers: [],
   homePoints: 0,

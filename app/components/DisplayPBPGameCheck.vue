@@ -14,8 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import type { PBPGameCheck } from '~/server/utils/types'
-
 const props = defineProps({
   gameData: { type: Object as PropType<PBPGameCheck>, required: true },
 })
