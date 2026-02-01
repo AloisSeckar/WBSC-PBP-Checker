@@ -20,14 +20,17 @@
     </h2>
     <div v-if="useRuntimeConfig().public.adminVersion" class="mb-2 flex flex-row gap-2 items-center">
       Get links for:
-      <USelect v-model="filterVariant" :items="variantOptions" class="w-24" />
+      <USelect v-model="filterVariant" :items="variantOptions" class="w-28" @change="setLeague" />
       <USelect v-model="filterLeague" :items="leagueOptions" class="w-20" />
       in
       <USelect v-model="filterMonth" :items="monthOptions" class="w-20" />
-      <USelect v-model="filterYear" :items="yearOptions" class="w-20" />
+      <USelect v-model="filterYear" :items="yearOptions" class="w-20" disabled />
       <UButton @click="getLinks">
         Get links
       </UButton>
+      <div v-if="gamesArray.length > 0 && !loading" class="ml-4">
+        <strong>{{ gamesArray.length }}</strong> games found
+      </div>
     </div>
     <div class="mb-2">
       <UTextarea id="games" v-model="gamesText" :rows="6" class="w-full" />
@@ -69,17 +72,21 @@ const monthOptions = ['all', '04', '05', '06', '07', '08', '09', '10']
 const filterYear = ref('2025')
 const yearOptions = ['2024', '2025']
 
-const filterLeague = ref('')
+const filterLeague = ref('EXL')
 const leagueOptions = computed(() => {
   switch (filterVariant.value) {
     case 'baseball':
-      return ['EXL', 'LIG', 'U23', 'U18']
+      return ['EXL', 'NAD', 'LIG', 'U23', 'U18']
     case 'softball':
       return ['ELM', 'ELZ', 'ELJI', 'ELJY']
     default:
       return ['']
   }
 })
+
+const setLeague = () => {
+  filterLeague.value = leagueOptions.value[0]!
+}
 
 async function getLinks() {
   if (filterVariant.value && filterLeague.value) {

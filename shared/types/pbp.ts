@@ -154,3 +154,14 @@ export type WBSCAppData = {
   boxScore: WBSCBoxScore
   gamePlays: WBSCAllGamePlays
 }
+
+// 2026 - extracting games from WBSC league sites
+
+export type WBSCGameInfo = {
+  id: number
+  start_date: string // eg: "2025-04-04 19:00:00"
+}
+
+export type WBSCLeagueData = {
+  games: WBSCGameInfo[]
+}

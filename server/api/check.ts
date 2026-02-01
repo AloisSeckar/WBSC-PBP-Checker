@@ -16,6 +16,11 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
   const games: PBPGameCheck[] = []
 
   for (const gameLink of gameLinks) {
+    if (!gameLink || gameLink.trim() === '') {
+      // skip accidental empty lines
+      continue
+    }
+
     const problems: string[] = []
 
     let gameTitle = 'UNKNOWN'

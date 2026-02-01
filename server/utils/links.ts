@@ -1,18 +1,22 @@
-// links to competition schedules on www.softball.cz website
-export const LINK_S_ELM = 'https://softball.cz/modules.php?op=modload&name=liga&file=index&do=schedule&akce=1222&pda=2&admina=&vyloucene=1'
-export const LINK_S_ELZ = 'https://softball.cz/modules.php?op=modload&name=liga&file=index&do=schedule&akce=1221&pda=2&admina=&vyloucene=1'
-export const LINK_S_ELJI = 'https://softball.cz/modules.php?op=modload&name=liga&file=index&do=schedule&akce=1231&pda=2&admina=&vyloucene=1'
-export const LINK_S_ELJY = 'https://softball.cz/modules.php?op=modload&name=liga&file=index&do=schedule&akce=1227&pda=2&admina=&vyloucene=1'
+// links to competition schedules on https://czechsoftball.wbsc.org/ website
+
+export const LINK_S_ELM = 'https://czechsoftball.wbsc.org/cs/events/2025-extraliga-mu-2025/schedule-and-results'
+export const LINK_S_ELZ = 'https://czechsoftball.wbsc.org/cs/events/2025-extraliga-en-2025/schedule-and-results'
+export const LINK_S_ELJI = 'https://czechsoftball.wbsc.org/cs/events/2025-u20-extraliga-junior-2025/schedule-and-results'
+export const LINK_S_ELJY = 'https://czechsoftball.wbsc.org/cs/events/2025-u20-extraliga-junior-2025/home'
 
 export const LINKS_SOFTBALL = [LINK_S_ELM, LINK_S_ELZ, LINK_S_ELJI, LINK_S_ELJY]
 
-// links to competition schedules on www.baseball.cz website
-export const LINK_B_EXL = 'https://www.baseball.cz/soutez-753/extraliga/zakladni-cast'
-export const LINK_B_LIG = 'https://www.baseball.cz/soutez-754/1-liga/zakladni-cast'
-export const LINK_B_U23 = 'https://www.baseball.cz/soutez-755/prospect-league-u23/zakladni-cast'
-export const LINK_B_U18 = 'https://www.baseball.cz/soutez-756/extraliga-u18/zakladni-cast'
+// links to competition schedules on https://stats.baseball.cz/ website
+export const LINK_B_EXL = 'https://stats.baseball.cz/cs/events/2025-extraliga-2025/schedule-and-results'
+export const LINK_B_NAD = 'https://stats.baseball.cz/cs/events/2025-nadstavba-o-extraligu-2025/schedule-and-results'
+export const LINK_B_LIG = 'https://stats.baseball.cz/cs/events/2025-1-liga-2025/schedule-and-results'
+export const LINK_B_U23 = 'https://stats.baseball.cz/cs/events/extraliga-u23-2025/schedule-and-results'
+export const LINK_B_U18 = 'https://stats.baseball.cz/cs/events/2025-extraliga-u18-2025/schedule-and-results'
 
-export const LINKS_BASEBALL = [LINK_B_EXL, LINK_B_LIG, LINK_B_U23, LINK_B_U18]
+export const LINKS_BASEBALL = [LINK_B_EXL, LINK_B_NAD, LINK_B_LIG, LINK_B_U23, LINK_B_U18]
+
+// TODO other competitions
 
 // translate league name to link
 
@@ -28,6 +32,8 @@ export function getLinkForLeague(league: string) {
       return LINK_S_ELJY
     case 'EXL':
       return LINK_B_EXL
+    case 'NAD':
+      return LINK_B_NAD
     case 'LIG':
       return LINK_B_LIG
     case 'U23':
