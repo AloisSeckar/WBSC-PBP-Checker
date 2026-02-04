@@ -33,7 +33,7 @@
       </div>
     </div>
     <div class="mb-2">
-      <UTextarea id="games" v-model="gamesText" :rows="6" class="w-full" />
+      <UTextarea id="games" v-model="gamesText" :rows="6" class="w-full max-w-[725px]" />
     </div>
     <UButton @click="check">
       Check games
@@ -61,7 +61,7 @@ import { useIntervalFn } from '@vueuse/core'
 const loading = ref(false)
 
 const gamesText = ref('')
-const gamesArray = computed(() => gamesText.value.split('\n'))
+const gamesArray = computed(() => gamesText.value.split('\n').filter(link => link.trim() !== ''))
 
 const filterVariant = ref('softball')
 const variantOptions = ['baseball', 'softball']
@@ -72,7 +72,7 @@ const monthOptions = ['all', '04', '05', '06', '07', '08', '09', '10']
 const filterYear = ref('2025')
 const yearOptions = ['2024', '2025']
 
-const filterLeague = ref('EXL')
+const filterLeague = ref('ELM')
 const leagueOptions = computed(() => {
   switch (filterVariant.value) {
     case 'baseball':
