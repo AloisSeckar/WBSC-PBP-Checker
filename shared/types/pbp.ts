@@ -74,6 +74,7 @@ export type WBSCAssignment = {
 
 export type WBSCGameData = {
   gamenumber: number
+  gamestatus: number
   homeid: number
   homeioc: string
   awayid: number

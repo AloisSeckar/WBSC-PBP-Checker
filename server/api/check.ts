@@ -34,12 +34,23 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
       const rawData = await gamePage.$eval('#app', el => el.getAttribute('data-page'))
       appData = JSON.parse(rawData).props.viewData.original as WBSCAppData
 
-      if (appData) {
-        // analyze input data
-        const inputProblems = analyzeInput(appData)
-        if (inputProblems.length > 0) {
-          problems.push(...inputProblems)
-        }
+      // skip scheduled, but non-played games
+      if (appData.gameData?.gamestatus === 0) {
+        const gameData = appData.gameData
+        games.push({
+          link: gameLink,
+          game: `#${gameData.gamenumber} - ${gameData.homeioc} vs. ${gameData.awayioc} (${gameData.start}) (NOT PLAYED)`,
+          scorer: 'Not assigned',
+          result: 'OK',
+          problems,
+        })
+        continue
+      }
+
+      // analyze input data
+      const inputProblems = analyzeInput(appData)
+      if (inputProblems.length > 0) {
+        problems.push(...inputProblems)
       }
 
       if (appData && problems.length == 0) {

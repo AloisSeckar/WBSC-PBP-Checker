@@ -21,7 +21,8 @@ const props = defineProps({
 const cssClass = computed(() => {
   const baseCss = 'my-2 px-4 py-2 rounded-lg border-2 border-black text-gray-900'
   const colorsCss = props.gameData.result === 'OK' ? 'text-gray-900 bg-primary-400' : 'bg-red-300'
-  return baseCss + ' ' + colorsCss
+  const notPlayedCss = props.gameData.game.includes('(NOT PLAYED)') ? 'bg-amber-200!' : ''
+  return baseCss + ' ' + colorsCss + ' ' + notPlayedCss
 })
 const link = 'text-gray-700 hover:text-primary-600'
 </script>
