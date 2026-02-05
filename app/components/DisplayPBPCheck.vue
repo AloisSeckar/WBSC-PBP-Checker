@@ -5,7 +5,7 @@
     </h2>
     <div v-if="checkData?.date" :class="cssClass">
       <div class="flex flex-row gap-2">
-        <strong>Display:</strong> All results <USwitch v-model="errorsOnly" /> Errors only
+        <strong>Display:</strong> All results ({{ countAll }}) <USwitch v-model="errorsOnly" /> Errors only ({{ countErr }})
       </div>
       <div>
         <strong>Checked at:</strong> {{ useDateFormat(checkData.date, 'YYYY-MM-DD HH:mm:ss').value }}
@@ -30,6 +30,9 @@ const displayedData = computed(() => {
     return games
   }
 })
+
+const countAll = computed(() => props.checkData?.games?.length ?? 0)
+const countErr = computed(() => props.checkData?.games?.filter(g => g.result !== 'OK').length ?? 0)
 
 const cssClass = computed(() => {
   const baseCss = 'px-4 py-2 rounded-lg border-2 border-black text-gray-900'
