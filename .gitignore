@@ -4,6 +4,3 @@
 chrome
 dist
 node_modules
-
-# Nuxt Ignis
-_ignis-config.json

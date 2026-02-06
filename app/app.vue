@@ -5,7 +5,7 @@
       class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-32 z-10 bg-primary text-gray-900 font-bold rounded flex items-center justify-center"
       :class="loadingBorder"
     >
-      <div class="w-[90px]">
+      <div class="w-22.5">
         {{ loadingText }}
       </div>
     </div>
@@ -33,7 +33,7 @@
       </div>
     </div>
     <div class="mb-2">
-      <UTextarea id="games" v-model="gamesText" :rows="6" class="w-full max-w-[725px]" />
+      <UTextarea id="games" v-model="gamesText" :rows="6" class="w-full max-w-181.25" />
     </div>
     <UButton @click="check">
       Check games
@@ -47,9 +47,6 @@
           https://github.com/AloisSeckar/WBSC-PBP-Checker
         </a>
         for more info and contact
-      </div>
-      <div>
-        The website is powered by <a href="https://github.com/AloisSeckar/nuxt-ignis" class="text-blue-600 hover:text-blue-400">Nuxt Ignis</a>
       </div>
     </footer>
   </div>

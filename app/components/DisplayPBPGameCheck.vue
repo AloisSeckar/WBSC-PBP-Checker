@@ -1,7 +1,7 @@
 <template>
   <div>
     <div :class="cssClass">
-      <div><strong>Game:</strong> <a :href="gameData.link" :class="link">{{ gameData.game }}</a></div>
+      <div><strong>Game:</strong> <a :href="gameData.link" target="_blank" :class="link">{{ gameData.game }}</a></div>
       <div><strong>Scorer:</strong> {{ gameData.scorer }}</div>
       <div v-for="problem in gameData.problems" :key="problem.toString()">
         &#8594; {{ problem }}

@@ -49,7 +49,7 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   let firstAwayPlay
   let i = 0
   do {
-    firstAwayPlay = gamePlays['1'].top.at(i++)
+    firstAwayPlay = gamePlays['1']!.top.at(i++)
   } while (!firstAwayPlay || firstAwayPlay.pitch_pitches < 1)
 
   const homeStarter = firstAwayPlay.pitcherid
@@ -70,7 +70,7 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   let firstHomePlay
   i = 0
   do {
-    firstHomePlay = gamePlays['1'].bot.at(i++)
+    firstHomePlay = gamePlays['1']!.bot.at(i++)
   } while (!firstHomePlay || firstHomePlay.pitch_pitches < 1)
 
   const awayStarter = firstHomePlay.pitcherid
@@ -88,7 +88,7 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
   }
 
   for (const inn in gamePlays) {
-    gamePlays[inn].top?.forEach((play) => {
+    gamePlays[inn]!.top?.forEach((play) => {
       // handle scoring plays
       if (play.narrative.includes('scores') || play.narrative.includes('homers')) {
         console.log(play.narrative)
@@ -105,11 +105,11 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
       // handle substitutions
       if (play.narrative.includes('Pitching Change')) {
         console.log(play.narrative)
-        const nextPlay = getNextPlay(gamePlays[inn].top, play.playorder)
+        const nextPlay = getNextPlay(gamePlays[inn]!.top, play.playorder)
         changePitcher(play.narrative, nextPlay)
       }
     })
-    gamePlays[inn].bot?.forEach((play) => {
+    gamePlays[inn]!.bot?.forEach((play) => {
       // handle scoring plays
       if (play.narrative.includes('scores') || play.narrative.includes('homers')) {
         console.log(play.narrative)
@@ -126,7 +126,7 @@ export function analyzePitching(gameAnalysis: PBPGameAnalysis, appData: WBSCAppD
       // handle substitutions
       if (play.narrative.includes('Pitching Change')) {
         console.log(play.narrative)
-        const nextPlay = getNextPlay(gamePlays[inn].bot, play.playorder)
+        const nextPlay = getNextPlay(gamePlays[inn]!.bot, play.playorder)
         changePitcher(play.narrative, nextPlay)
       }
     })

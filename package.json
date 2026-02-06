@@ -7,12 +7,18 @@
     "start": "nuxt preview"
   },
   "dependencies": {
+    "@nuxt/eslint": "1.13.0",
+    "@nuxt/ui": "4.4.0",
     "@sparticuz/chromium": "^143.0.0",
     "@types/nodemailer": "^7.0.0",
+    "@vueuse/core": "14.2.0",
+    "@vueuse/nuxt": "14.2.0",
     "nodemailer": "^7.0.0",
+    "nuxt": "4.3.0",
     "nuxt-cron": "1.8.0",
-    "nuxt-ignis": "0.5.3",
-    "puppeteer-core": "^24.0.0"
+    "puppeteer-core": "^24.0.0",
+    "typescript": "5.9.3",
+    "vue": "3.5.27"
   },
   "packageManager": "pnpm@10.28.2"
 }

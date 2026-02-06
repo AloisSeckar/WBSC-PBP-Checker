@@ -119,12 +119,12 @@ export default defineEventHandler(async (event): Promise<PBPCheck> => {
         const inn = Object.keys(gamePlays).map(p => parseInt(p))
         inn.forEach((key) => {
           // top of inning
-          gamePlays[key].top?.forEach((_play) => {
+          gamePlays[key]?.top?.forEach((_play) => {
             // console.log(play.narrative)
             // TODO check hits + forced outs (singles/doubles/triples)
           })
           // bottom of inning
-          gamePlays[key].bot?.forEach((_play) => {
+          gamePlays[key]?.bot?.forEach((_play) => {
             // console.log(play.narrative)
             // TODO check hits + forced outs (singles/doubles/triples)
           })

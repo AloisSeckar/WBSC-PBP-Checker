@@ -1,12 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  extends: [
-    'nuxt-ignis',
-  ],
-
   modules: [
+    '@nuxt/eslint',
+    '@nuxt/ui',
+    '@vueuse/nuxt',
     'nuxt-cron',
   ],
+
+  css: ['~/assets/main.css'],
 
   runtimeConfig: {
     emailPassword: '',
@@ -16,6 +17,8 @@ export default defineNuxtConfig({
       automatedCheck: '0 6 * * MON',
     },
   },
+
+  compatibilityDate: '2026-02-01',
 
   eslint: {
     config: {

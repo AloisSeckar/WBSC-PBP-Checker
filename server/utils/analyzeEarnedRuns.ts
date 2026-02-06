@@ -4,8 +4,8 @@ export function analyzeEarnedRuns(gamePlays: WBSCGamePlays): string[] {
   const issues: string[] = []
 
   for (const inn in gamePlays) {
-    issues.push(...analyzeInvalidER(gamePlays[inn].top, inn, true))
-    issues.push(...analyzeInvalidER(gamePlays[inn].bot, inn, false))
+    issues.push(...analyzeInvalidER(gamePlays[inn]!.top, inn, true))
+    issues.push(...analyzeInvalidER(gamePlays[inn]!.bot, inn, false))
   }
 
   return issues
