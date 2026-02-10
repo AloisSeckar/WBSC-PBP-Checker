@@ -11,6 +11,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     emailPassword: '',
+    githubToken: '',
     public: {
       chromium: '/opt/bin/chromium',
       adminVersion: false,
