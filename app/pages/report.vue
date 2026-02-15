@@ -55,9 +55,12 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>
 
+const gameLink = useState<string>('reportLink')
+const reportType = useState<PBPReportType | undefined>('reportType')
+
 const state = reactive({
-  gameLink: '',
-  reportType: undefined as 'false-positive' | 'false-negative' | undefined,
+  gameLink: gameLink.value,
+  reportType: reportType.value,
   issue: '',
   description: '',
 })
