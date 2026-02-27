@@ -39,7 +39,7 @@ const cssCard = computed(() => {
   const notPlayedCss = props.gameData.game.includes('(NOT PLAYED)') ? 'bg-amber-200!' : ''
   return baseCss + ' ' + colorsCss + ' ' + notPlayedCss
 })
-const cssLink = 'text-gray-700 hover:text-primary-600'
+const cssLink = 'ml-2 text-gray-700 hover:text-primary-600'
 
 const gameLink = useState<string>('reportLink')
 const reportType = useState<PBPReportType | undefined>('reportType')
