@@ -130,6 +130,7 @@ export type WBSCBoxScore = {
 
 export type WBSCGamePlay = {
   playorder: number
+  gameid: number
   batterid: number
   pitcherid: number
   pitch_pitches: number
@@ -138,6 +139,28 @@ export type WBSCGamePlay = {
   runner2: number
   runner3: number
   narrative: string
+}
+
+export type WBSCGamePlayDetailBoxScore = {
+  playerid: string // use this to match with current pitcher
+  name: string
+  PITCHER?: number // for pitcher there are at least two records - one for batting, other for pitching
+  PITCHR?: number // for pitcher there are at least two records - one for batting, other for pitching
+}
+
+export type WBSCGamePlayDetailInfo = {
+  id: number
+  label: string
+}
+
+// result of https://s3-eu-west-1.amazonaws.com/game.wbsc.org/gamedata/${gameid}/play${playorder}.json
+export type WBSCGamePlayDetail = {
+  lastplayloaded: number
+  platecount: WBSCGamePlayDetailInfo[]
+  boxscore: {
+    // keys are actually numbers: "1010", "1020", ... for visitors, "2010", "2020", ... for home team
+    [key: string]: WBSCGamePlayDetailBoxScore
+  }
 }
 
 export type WBSCGamePlays = {
