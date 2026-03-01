@@ -59,6 +59,22 @@ export type PBPPitchingAnalysis = {
   awayTeamIsAhead: boolean
 }
 
+export type PBPERAnalysisRunner = {
+  runner: string
+  pitcher: number
+  reachedOnError: boolean
+  scoredAfter3rdOpportunity: boolean
+  tiebreak: boolean
+  run: boolean
+  earnedRun: boolean
+}
+
+export type PBPERAnalysisPitcher = {
+  pitcher: number
+  runs: number
+  earnedRuns: number
+}
+
 // types derived from WBSC data object
 
 export type WBSCTournamentInfo = {
