@@ -303,7 +303,7 @@ function changePitcher(play: string, nextPlay: WBSCGamePlay) {
 }
 
 function getNextPlay(plays: WBSCGamePlay[], order: number) {
-  return plays.find(p => p.playorder = order + 1)!
+  return plays.find(p => p.playorder === order + 1)!
 }
 
 function toPBPPitcherAnalysis(stats: WBSCPlayerStats): PBPPitcherAnalysis {
