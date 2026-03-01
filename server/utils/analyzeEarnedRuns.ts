@@ -135,7 +135,20 @@ async function analyzeInvalidER(plays: WBSCGamePlay[], opts: { inn: number, top:
         for (const n of narratives) {
           if (n.includes('scores') || n.includes('homers')) {
             const scoringPlayer = n.match(/^(.*)\s(scores|homers)/)?.[1] || '???'
-            const runner = runners.find(r => scoringPlayer.includes(r.runner) || r.tiebreak)!
+
+            // try getting runner by name
+            let runner = runners.find(r => scoringPlayer.includes(r.runner))
+            if (!runner) {
+              // if runner not found by name, it might be a tiebreaker runner
+              // (the name is not easily extractable)
+              runner = runners.find(r => scoringPlayer.includes(r.runner))
+            }
+
+            if (!runner) {
+              console.warn(`Runner not found for scoring player ${scoringPlayer} in inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'})`)
+              continue
+            }
+
             // run was made
             runner.run = true
             // how many out opportunities were there?
@@ -168,7 +181,7 @@ async function analyzeInvalidER(plays: WBSCGamePlay[], opts: { inn: number, top:
         }
 
         // check how many R/ER were scored in PBP
-        let erIssues = false
+        let erIssues = 0
         for (const p of pitchers) {
           // get pitcher ER before and after the play
           const pitcherBefore = await getPitcherDetails(play.gameid, p.pitcher, playOrder - 1)
@@ -184,12 +197,12 @@ async function analyzeInvalidER(plays: WBSCGamePlay[], opts: { inn: number, top:
           const earnedRunsScored = erCurrent - erBefore
 
           if (earnedRunsScored !== p.earnedRuns) {
-            erIssues = true
-            issues.push(`Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Pitcher ${pitcherCurrent?.name} got ${earnedRunsScored} ER, but should be credited ${p.earnedRuns} ER based on the play-by-play analysis`)
+            erIssues = earnedRunsScored > p.earnedRuns ? 1 : 2
+            issues.push(`Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Pitcher ${pitcherCurrent?.name} got ${earnedRunsScored} ER, but should be credited ${p.earnedRuns} ER based on the PBP analysis`)
           }
         }
 
-        if (erIssues) {
+        if (erIssues === 1) {
           for (const r of runners.filter(r => r.run && !r.earnedRun)) {
             if (r.scoredAfter3rdOpportunity) {
               issues.push(`Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Runner ${r.runner} scored after 3rd opportunity, the run should be UNEARNED`)
@@ -198,8 +211,12 @@ async function analyzeInvalidER(plays: WBSCGamePlay[], opts: { inn: number, top:
               issues.push(`Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Runner ${r.runner} reached on error and scored, the run should be UNEARNED`)
             }
             if (r.tiebreak) {
-              issues.push(`Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Runner ${r.runner} scored as a tiebreak runner, the run should be UNEARNED`)
+              issues.push(`Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Runner ${r.runner} scored as a tiebreaker runner, the run should be UNEARNED`)
             }
+          }
+        } else if (erIssues === 2) {
+          for (const r of runners.filter(r => r.run && r.earnedRun)) {
+            issues.push(`Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Runner ${r.runner} should be scored as earned`)
           }
         }
 
