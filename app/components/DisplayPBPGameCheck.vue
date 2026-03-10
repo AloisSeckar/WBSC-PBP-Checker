@@ -34,12 +34,12 @@ const props = defineProps({
 })
 
 const cssCard = computed(() => {
-  const baseCss = 'my-2 px-4 py-2 rounded-lg border-2 border-black text-gray-900'
-  const colorsCss = props.gameData.result === 'OK' ? 'text-gray-900 bg-primary-400' : 'bg-red-300'
-  const notPlayedCss = props.gameData.game.includes('(NOT PLAYED)') ? 'bg-amber-200!' : ''
+  const baseCss = 'my-2 px-4 py-3 rounded-lg shadow-sm transition-shadow hover:shadow-md'
+  const colorsCss = props.gameData.result === 'OK' ? 'bg-emerald-50 border-l-3 border-emerald-400 text-slate-800' : 'bg-red-50 border-l-3 border-red-400 text-slate-800'
+  const notPlayedCss = props.gameData.game.includes('(NOT PLAYED)') ? 'bg-amber-50! border-amber-400!' : ''
   return baseCss + ' ' + colorsCss + ' ' + notPlayedCss
 })
-const cssLink = 'ml-2 text-gray-700 hover:text-primary-600'
+const cssLink = 'ml-2 font-medium text-accent hover:text-accent-light transition-colors'
 
 const gameLink = useState<string>('reportLink')
 const reportType = useState<PBPReportType | undefined>('reportType')

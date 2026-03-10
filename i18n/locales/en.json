@@ -12,6 +12,7 @@
   },
   "checker": {
     "results": "Check results",
+    "init": "Insert game link(s) and click 'Check games' to get started",
     "display": "Display",
     "all": "All results",
     "errors": "Errors only",

@@ -1,39 +1,42 @@
 <template>
-  <div class="p-4">
-    <div class="mb-4">
-      <NuxtLink to="/" class="text-blue-600 hover:text-blue-400">
+  <div>
+    <div class="mb-6">
+      <NuxtLink to="/" class="inline-flex items-center gap-1 text-sm font-medium text-accent hover:text-accent-light transition-colors">
         &larr; {{ $t('report.back') }}
       </NuxtLink>
     </div>
-    <h2 class="mb-4 text-2xl font-bold">
-      {{ $t('report.title') }}
-    </h2>
 
-    <UForm :schema="schema" :state="state" class="max-w-lg space-y-4" @submit="onSubmit">
-      <UFormField :label="$t('report.gameLink')" name="gameLink" required>
-        <UInput v-model="state.gameLink" placeholder="https://game.wbsc.org/..." class="w-full" />
-      </UFormField>
+    <div class="rounded-xl bg-slate-300 p-6 shadow-lg">
+      <h2 class="mb-6 text-xl font-bold text-accent">
+        {{ $t('report.title') }}
+      </h2>
 
-      <UFormField :label="$t('report.reportType')" name="reportType" required>
-        <URadioGroup v-model="state.reportType" :items="reportTypeOptions" />
-      </UFormField>
+      <UForm :schema="schema" :state="state" class="max-w-lg space-y-5" @submit="onSubmit">
+        <UFormField :label="$t('report.gameLink')" name="gameLink" required :ui="{ label: 'text-slate-800' }">
+          <UInput v-model="state.gameLink" placeholder="https://game.wbsc.org/..." class="w-full" />
+        </UFormField>
 
-      <UFormField :label="$t('report.issue')" name="issue" required>
-        <UInput v-model="state.issue" :placeholder="$t('report.issuePlaceholder')" class="w-full" />
-      </UFormField>
+        <UFormField :label="$t('report.reportType')" name="reportType" required :ui="{ label: 'text-slate-800' }">
+          <URadioGroup v-model="state.reportType" :items="reportTypeOptions" :ui="{ label: 'text-slate-800' }" />
+        </UFormField>
 
-      <UFormField :label="$t('report.description')" name="description" required>
-        <UTextarea v-model="state.description" :placeholder="$t('report.descriptionPlaceholder')" :rows="5" class="w-full" />
-      </UFormField>
+        <UFormField :label="$t('report.issue')" name="issue" required :ui="{ label: 'text-slate-800' }">
+          <UInput v-model="state.issue" :placeholder="$t('report.issuePlaceholder')" class="w-full" />
+        </UFormField>
 
-      <div class="flex items-center gap-4">
-        <UButton type="submit" :loading="submitting">
-          {{ $t('report.submit') }}
-        </UButton>
-        <span v-if="successMessage" class="text-green-600 font-medium">{{ successMessage }}</span>
-        <span v-if="errorMessage" class="text-red-600 font-medium">{{ errorMessage }}</span>
-      </div>
-    </UForm>
+        <UFormField :label="$t('report.description')" name="description" required :ui="{ label: 'text-slate-800' }">
+          <UTextarea v-model="state.description" :placeholder="$t('report.descriptionPlaceholder')" :rows="5" class="w-full" />
+        </UFormField>
+
+        <div class="flex items-center gap-4 pt-2">
+          <UButton type="submit" size="lg" :loading="submitting">
+            {{ $t('report.submit') }}
+          </UButton>
+          <span v-if="successMessage" class="text-sm font-medium text-emerald-500">{{ successMessage }}</span>
+          <span v-if="errorMessage" class="text-sm font-medium text-red-400">{{ errorMessage }}</span>
+        </div>
+      </UForm>
+    </div>
   </div>
 </template>
 

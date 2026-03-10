@@ -1,37 +1,44 @@
 <template>
-  <div class="p-4">
+  <div>
+    <!-- Loading overlay -->
     <div
       v-show="loading"
-      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-32 z-10 bg-primary text-gray-900 font-bold rounded flex items-center justify-center"
-      :class="loadingBorder"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
     >
-      <div class="w-22.5">
-        {{ loadingText }}
+      <div class="rounded-xl bg-slate-300 px-8 py-4 shadow-xl border border-slate-600">
+        <div class="text-lg font-bold text-accent">
+          {{ loadingText }}
+        </div>
       </div>
     </div>
-    <h2 class="mb-4 text-2xl font-bold">
-      {{ $t('index.getGames') }}
-    </h2>
-    <div v-if="useRuntimeConfig().public.adminVersion" class="mb-2 flex flex-row gap-2 items-center">
-      {{ $t('index.linksFor') }}:
-      <USelect v-model="filterVariant" :items="variantOptions" class="w-28" @change="setLeague" />
-      <USelect v-model="filterLeague" :items="leagueOptions" class="w-20" />
-      {{ $t('index.linksIn') }}
-      <USelect v-model="filterMonth" :items="monthOptions" class="w-20" />
-      <USelect v-model="filterYear" :items="yearOptions" class="w-20" disabled />
-      <UButton @click="getLinks">
-        {{ $t('index.getLinks') }}
+
+    <!-- Games input section -->
+    <div class="rounded-xl bg-slate-300 p-6 shadow-lg">
+      <h2 class="mb-5 text-xl font-bold text-accent">
+        {{ $t('index.getGames') }}
+      </h2>
+      <div v-if="useRuntimeConfig().public.adminVersion" class="mb-4 flex flex-wrap items-center gap-2 rounded-lg bg-slate-400 p-3 text-sm text-slate-800">
+        <span class="font-medium text-black">{{ $t('index.linksFor') }}:</span>
+        <USelect v-model="filterVariant" :items="variantOptions" class="w-28" @change="setLeague" />
+        <USelect v-model="filterLeague" :items="leagueOptions" class="w-20" />
+        <span class="font-medium text-black">{{ $t('index.linksIn') }}</span>
+        <USelect v-model="filterMonth" :items="monthOptions" class="w-20" />
+        <USelect v-model="filterYear" :items="yearOptions" class="w-20" disabled />
+        <UButton @click="getLinks">
+          {{ $t('index.getLinks') }}
+        </UButton>
+        <div v-if="gamesArray.length > 0 && !loading" class="ml-4 font-medium text-accent">
+          {{ $t('index.found1') }} <strong>{{ gamesArray.length }}</strong> {{ $t('index.found2') }}
+        </div>
+      </div>
+      <div class="mb-4">
+        <UTextarea id="games" v-model="gamesText" :rows="6" class="w-full" />
+      </div>
+      <UButton size="lg" @click="check">
+        {{ $t('index.checkGames') }}
       </UButton>
-      <div v-if="gamesArray.length > 0 && !loading" class="ml-4">
-        {{ $t('index.found1') }} <strong>{{ gamesArray.length }}</strong> {{ $t('index.found2') }}
-      </div>
     </div>
-    <div class="mb-2">
-      <UTextarea id="games" v-model="gamesText" :rows="6" class="w-full max-w-181.25" />
-    </div>
-    <UButton @click="check">
-      {{ $t('index.checkGames') }}
-    </UButton>
+
     <DisplayPBPCheck :check-data="pbpCheckData" />
   </div>
 </template>
@@ -117,21 +124,12 @@ function showPending(show: boolean) {
 
 const translatedText = useNuxtApp().$i18n.t('index.loading')
 const loadingText = ref(`${translatedText}...`)
-const loadingBorder = ref('border-[0px]')
 const { pause, resume } = useIntervalFn(() => {
   if (loadingText.value.endsWith('...')) {
     loadingText.value = `${translatedText}`
   } else {
     loadingText.value += '.'
   }
-
-  let border = parseInt(loadingBorder.value.at(-4)!)
-  if (border < 3) {
-    border++
-  } else {
-    border = 0
-  }
-  loadingBorder.value = `border-[${border}px]`
 }, 400)
 pause()
 </script>

@@ -1,17 +1,25 @@
 <template>
-  <div class="my-4">
-    <h2 class="mb-4 text-2xl font-bold">
+  <div class="mt-8">
+    <h2 class="mb-4 text-xl font-bold text-accent">
       {{ $t('checker.results') }}
     </h2>
     <div v-if="checkData?.date" :class="cssClass">
-      <div class="flex flex-row gap-2">
-        <strong>{{ $t('checker.display') }}:</strong> {{ $t('checker.all') }} ({{ countAll }}) <USwitch v-model="errorsOnly" /> {{ $t('checker.errors') }} ({{ countErr }})
+      <div class="flex flex-wrap items-center gap-3 text-sm">
+        <span class="font-semibold text-accent-dark">{{ $t('checker.display') }}:</span>
+        <span class="text-slate-800">{{ $t('checker.all') }} ({{ countAll }})</span>
+        <USwitch v-model="errorsOnly" />
+        <span class="text-slate-800">{{ $t('checker.errors') }} ({{ countErr }})</span>
       </div>
-      <div>
+      <div class="mt-2 text-sm text-slate-800">
         <strong>{{ $t('checker.checkedAt') }}:</strong> {{ useDateFormat(checkData.date, 'YYYY-MM-DD HH:mm:ss').value }}
       </div>
       <div v-for="gameData in displayedData" :key="gameData.link">
         <DisplayPBPGameCheck :game-data="gameData" />
+      </div>
+    </div>
+    <div v-else class="rounded-xl bg-slate-300 px-8 py-4 shadow-xl border border-slate-600">
+      <div class="text-md text-black">
+        {{ $t('checker.init') }}
       </div>
     </div>
   </div>
@@ -35,8 +43,8 @@ const countAll = computed(() => props.checkData?.games?.length ?? 0)
 const countErr = computed(() => props.checkData?.games?.filter(g => g.result !== 'OK').length ?? 0)
 
 const cssClass = computed(() => {
-  const baseCss = 'px-4 py-2 rounded-lg border-2 border-black text-gray-900'
-  const colorsCss = props.checkData?.result === 'OK' ? 'bg-primary-100' : 'bg-red-100'
+  const baseCss = 'px-5 py-4 rounded-xl bg-slate-300 shadow-lg'
+  const colorsCss = props.checkData?.result === 'OK' ? 'border-l-4 border-accent' : 'border-l-4 border-red-400'
   return baseCss + ' ' + colorsCss
 })
 

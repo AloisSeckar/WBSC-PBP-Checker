@@ -1,3 +1,9 @@
 /* load Tailwind CSS and Nuxt UI styles */
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+@theme {
+  --color-accent: #00A7D7;
+  --color-accent-light: #33bde2;
+  --color-accent-dark: #0089b3;
+}
