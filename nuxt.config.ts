@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
+    '@nuxtjs/i18n',
     '@vueuse/nuxt',
     'nuxt-cron',
   ],
@@ -25,5 +26,12 @@ export default defineNuxtConfig({
     config: {
       stylistic: true,
     },
+  },
+
+  i18n: {
+    locales: [
+      { code: 'en', name: 'English', file: 'en.json' },
+    ],
+    defaultLocale: 'en',
   },
 })

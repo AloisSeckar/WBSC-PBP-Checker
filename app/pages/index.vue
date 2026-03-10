@@ -13,30 +13,30 @@
       WBSC-PBP-Checker
     </h1>
     <div class="mb-2">
-      Automated crawler for finding common scoring mistakes in Ballclubz play-by-play
+      {{ $t('index.about') }}
     </div>
     <h2 class="mb-4 text-2xl font-bold">
-      Games to be checked
+      {{ $t('index.getGames') }}
     </h2>
     <div v-if="useRuntimeConfig().public.adminVersion" class="mb-2 flex flex-row gap-2 items-center">
-      Get links for:
+      {{ $t('index.linksFor') }}:
       <USelect v-model="filterVariant" :items="variantOptions" class="w-28" @change="setLeague" />
       <USelect v-model="filterLeague" :items="leagueOptions" class="w-20" />
-      in
+      {{ $t('index.linksIn') }}
       <USelect v-model="filterMonth" :items="monthOptions" class="w-20" />
       <USelect v-model="filterYear" :items="yearOptions" class="w-20" disabled />
       <UButton @click="getLinks">
-        Get links
+        {{ $t('index.getLinks') }}
       </UButton>
       <div v-if="gamesArray.length > 0 && !loading" class="ml-4">
-        <strong>{{ gamesArray.length }}</strong> games found
+        {{ $t('index.found1') }} <strong>{{ gamesArray.length }}</strong> {{ $t('index.found2') }}
       </div>
     </div>
     <div class="mb-2">
       <UTextarea id="games" v-model="gamesText" :rows="6" class="w-full max-w-181.25" />
     </div>
     <UButton @click="check">
-      Check games
+      {{ $t('index.checkGames') }}
     </UButton>
     <DisplayPBPCheck :check-data="pbpCheckData" />
     <footer>
@@ -49,9 +49,9 @@
         for more info and contact
       </div>
       <div>
-        Found a problem?
+        {{ $t('footer.problem') }}
         <NuxtLink to="/report" class="text-blue-600 hover:text-blue-400">
-          Report it here
+          {{ $t('footer .report') }}
         </NuxtLink>
       </div>
     </footer>
@@ -137,11 +137,12 @@ function showPending(show: boolean) {
   }
 }
 
-const loadingText = ref('LOADING...')
+const translatedText = useNuxtApp().$i18n.t('index.loading')
+const loadingText = ref(`${translatedText}...`)
 const loadingBorder = ref('border-[0px]')
 const { pause, resume } = useIntervalFn(() => {
   if (loadingText.value.endsWith('...')) {
-    loadingText.value = 'LOADING'
+    loadingText.value = `${translatedText}`
   } else {
     loadingText.value += '.'
   }

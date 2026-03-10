@@ -1,0 +1,40 @@
+{
+  "index": {
+    "about" : "Automated crawler for finding common scoring mistakes in Ballclubz play-by-play",
+    "getGames": "Games to be checked",
+    "linksFor": "Get links for",
+    "linksIn": "in",
+    "getLinks": "Get links",
+    "found1": "Found",
+    "found2": "games",
+    "checkGames": "Check games",
+    "loading": "LOADING"
+  },
+  "checker": {
+    "results": "Check results",
+    "display": "Display",
+    "all": "All results",
+    "errors": "Errors only",
+    "checkedAt": "Checked at",
+    "game": "Game",
+    "scorer": "Scorer",
+    "report": "Report mistake"
+  },
+  "report": {
+    "back": "Back to checker",
+    "title": "Report problem",
+    "gameLink": "Link to the game (from Ballclubz)",
+    "reportType": "Type of problem",
+    "falsePositive": "Report false positive",
+    "falseNegative": "Report false negative",
+    "issue": "Issue",
+    "issuePlaceholder": "Brief issue summary",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe the problem in detail...",
+    "submit": "Submit report"
+  },
+  "footer": {
+    "problem": "Found a problem?",
+    "report": "Report it here"
+  }
+}

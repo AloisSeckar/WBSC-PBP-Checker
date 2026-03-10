@@ -5,33 +5,33 @@
     </h1>
     <div class="mb-4">
       <NuxtLink to="/" class="text-blue-600 hover:text-blue-400">
-        &larr; Back to checker
+        &larr; {{ $t('report.back') }}
       </NuxtLink>
     </div>
     <h2 class="mb-4 text-2xl font-bold">
-      Report problem
+      {{ $t('report.title') }}
     </h2>
 
     <UForm :schema="schema" :state="state" class="max-w-lg space-y-4" @submit="onSubmit">
-      <UFormField label="Game link" name="gameLink" required>
+      <UFormField :label="$t('report.gameLink')" name="gameLink" required>
         <UInput v-model="state.gameLink" placeholder="https://game.wbsc.org/..." class="w-full" />
       </UFormField>
 
-      <UFormField label="Report type" name="reportType" required>
+      <UFormField :label="$t('report.reportType')" name="reportType" required>
         <URadioGroup v-model="state.reportType" :items="reportTypeOptions" />
       </UFormField>
 
-      <UFormField label="Issue" name="issue" required>
-        <UInput v-model="state.issue" placeholder="Brief summary of the problem" class="w-full" />
+      <UFormField :label="$t('report.issue')" name="issue" required>
+        <UInput v-model="state.issue" :placeholder="$t('report.issuePlaceholder')" class="w-full" />
       </UFormField>
 
-      <UFormField label="Description" name="description" required>
-        <UTextarea v-model="state.description" placeholder="Describe the problem in detail..." :rows="5" class="w-full" />
+      <UFormField :label="$t('report.description')" name="description" required>
+        <UTextarea v-model="state.description" :placeholder="$t('report.descriptionPlaceholder')" :rows="5" class="w-full" />
       </UFormField>
 
       <div class="flex items-center gap-4">
         <UButton type="submit" :loading="submitting">
-          Submit report
+          {{ $t('report.submit') }}
         </UButton>
         <span v-if="successMessage" class="text-green-600 font-medium">{{ successMessage }}</span>
         <span v-if="errorMessage" class="text-red-600 font-medium">{{ errorMessage }}</span>
@@ -66,8 +66,8 @@ const state = reactive({
 })
 
 const reportTypeOptions = [
-  { value: 'false-positive', label: 'Report false positive' },
-  { value: 'false-negative', label: 'Report false negative' },
+  { value: 'false-positive', label: useNuxtApp().$i18n.t('report.falsePositive') },
+  { value: 'false-negative', label: useNuxtApp().$i18n.t('report.falseNegative') },
 ]
 
 const submitting = ref(false)

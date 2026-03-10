@@ -4,16 +4,16 @@
       <div class="flex flex-row">
         <div class="w-full">
           <div>
-            <strong>Game:</strong>
+            <strong>{{ $t('checker.game') }}:</strong>
             <a :href="gameData.link" target="_blank" :class="cssLink">{{ gameData.game }}</a>
           </div>
           <div>
-            <strong>Scorer:</strong> {{ gameData.scorer }}
+            <strong>{{ $t('checker.scorer') }}:</strong> {{ gameData.scorer }}
           </div>
         </div>
         <div>
           <UButton
-            label="Report mistake" color="warning" size="sm"
+            :label="$t('checker.report')" color="warning" size="sm"
             class="cursor-pointer" @click="report(gameData.link, gameData.result)"
           />
         </div>

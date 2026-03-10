@@ -1,14 +1,14 @@
 <template>
   <div class="my-4">
     <h2 class="mb-4 text-2xl font-bold">
-      Check results
+      {{ $t('checker.results') }}
     </h2>
     <div v-if="checkData?.date" :class="cssClass">
       <div class="flex flex-row gap-2">
-        <strong>Display:</strong> All results ({{ countAll }}) <USwitch v-model="errorsOnly" /> Errors only ({{ countErr }})
+        <strong>{{ $t('checker.display') }}:</strong> {{ $t('checker.all') }} ({{ countAll }}) <USwitch v-model="errorsOnly" /> {{ $t('checker.errors') }} ({{ countErr }})
       </div>
       <div>
-        <strong>Checked at:</strong> {{ useDateFormat(checkData.date, 'YYYY-MM-DD HH:mm:ss').value }}
+        <strong>{{ $t('checker.checkedAt') }}:</strong> {{ useDateFormat(checkData.date, 'YYYY-MM-DD HH:mm:ss').value }}
       </div>
       <div v-for="gameData in displayedData" :key="gameData.link">
         <DisplayPBPGameCheck :game-data="gameData" />
