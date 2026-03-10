@@ -1,8 +1,5 @@
 <template>
   <div class="p-4">
-    <h1 class="mb-4 text-3xl font-bold">
-      WBSC-PBP-Checker
-    </h1>
     <div class="mb-4">
       <NuxtLink to="/" class="text-blue-600 hover:text-blue-400">
         &larr; {{ $t('report.back') }}
