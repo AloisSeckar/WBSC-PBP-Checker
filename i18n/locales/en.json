@@ -1,13 +1,14 @@
 {
+  "header": {
+    "about" : "Automated crawler for finding common scoring mistakes in Ballclubz play-by-play"
+  },
   "index": {
-    "about" : "Automated crawler for finding common scoring mistakes in Ballclubz play-by-play",
     "game": "Game to be checked",
     "link": "PBP link",
     "check": "Check game",
     "loading": "LOADING"
   },
   "admin": {
-    "about" : "Automated crawler for finding common scoring mistakes in Ballclubz play-by-play",
     "getGames": "Games to be checked",
     "linksFor": "Get links for",
     "linksIn": "in",

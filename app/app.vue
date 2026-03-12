@@ -7,7 +7,7 @@
             <span class="text-accent">WBSC</span>-PBP-Checker
           </h1>
           <p class="mt-1 text-sm text-slate-400">
-            {{ $t('index.about') }}
+            {{ $t('header.about') }}
           </p>
         </div>
       </header>
