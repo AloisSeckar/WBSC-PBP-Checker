@@ -17,6 +17,7 @@
     "found1": "Found",
     "found2": "games",
     "checkGames": "Check games",
+    "gamesRequired": "Please enter at least one game link",
     "loading": "LOADING"
   },
   "checker": {
