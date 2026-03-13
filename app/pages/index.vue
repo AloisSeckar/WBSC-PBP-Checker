@@ -12,19 +12,7 @@
       </div>
     </div>
 
-    <!-- Game input section -->
-    <div class="rounded-xl bg-slate-300 p-6 shadow-lg">
-      <h2 class="mb-5 text-xl font-bold text-accent">
-        {{ $t('index.game') }}
-      </h2>
-      <div v-if="useRuntimeConfig().public.adminVersion" class="mb-4 flex flex-wrap items-center gap-2 rounded-lg bg-slate-400 p-3 text-sm text-slate-800">
-        <span class="font-medium text-black">{{ $t('index.link') }}:</span>
-        <UInput v-model="link" class="w-full" />
-      </div>
-      <UButton size="lg" @click="check">
-        {{ $t('index.check') }}
-      </UButton>
-    </div>
+    <GameInputSingle @check="check" />
 
     <DisplayPBPCheck :check-data="pbpCheckData" />
   </div>
@@ -35,17 +23,15 @@ import { useIntervalFn } from '@vueuse/core'
 
 const loading = ref(false)
 
-const link = ref('')
-
 const pbpCheckData = ref<PBPCheck | undefined>(undefined)
-async function check() {
+async function check(link: string) {
   pbpCheckData.value = undefined
   showPending(true)
-  console.debug(link.value)
+  console.debug(link)
   const data = await $fetch<PBPCheck>('/api/check', {
     method: 'POST',
     body: {
-      gameLinks: [link.value],
+      gameLinks: [link],
     },
   })
   console.debug(data)

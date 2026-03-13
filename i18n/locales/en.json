@@ -6,6 +6,7 @@
     "game": "Game to be checked",
     "link": "PBP link",
     "check": "Check game",
+    "linkRequired": "Please enter a game link",
     "loading": "LOADING"
   },
   "admin": {
