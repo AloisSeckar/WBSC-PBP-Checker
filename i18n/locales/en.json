@@ -2,12 +2,12 @@
   "header": {
     "about" : "Automated crawler for finding common scoring mistakes in Ballclubz play-by-play"
   },
+  "loading": "LOADING",
   "index": {
     "game": "Game to be checked",
     "link": "PBP link",
     "check": "Check game",
-    "linkRequired": "Please enter a game link",
-    "loading": "LOADING"
+    "linkRequired": "Please enter a game link"
   },
   "admin": {
     "getGames": "Games to be checked",
@@ -17,8 +17,7 @@
     "found1": "Found",
     "found2": "games",
     "checkGames": "Check games",
-    "gamesRequired": "Please enter at least one game link",
-    "loading": "LOADING"
+    "gamesRequired": "Please enter at least one game link"
   },
   "checker": {
     "results": "Check results",
