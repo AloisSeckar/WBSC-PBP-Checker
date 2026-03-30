@@ -184,7 +184,7 @@ async function analyzeInvalidER(plays: WBSCGamePlay[], opts: { inn: number, top:
         let erIssues = 0
         for (const p of pitchers) {
           // get pitcher ER before and after the play
-          const pitcherBefore = await getPitcherDetails(play.gameid, p.pitcher, playOrder - 1)
+          const pitcherBefore = await getPitcherDetails(play.gameid, p.pitcher, playOrder - (lastPlay ? 2 : 1))
           const pitcherCurrent = await getPitcherDetails(play.gameid, p.pitcher, playOrder)
 
           // comment this out for debugging / DO NOT DELETE
