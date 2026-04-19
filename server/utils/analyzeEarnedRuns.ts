@@ -198,25 +198,25 @@ async function analyzeInvalidER(plays: WBSCGamePlay[], opts: { inn: number, top:
 
           if (earnedRunsScored !== p.earnedRuns) {
             erIssues = earnedRunsScored > p.earnedRuns ? 1 : 2
-            issues.push(`Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Pitcher ${pitcherCurrent?.name} got ${earnedRunsScored} ER, but should be credited ${p.earnedRuns} ER based on the PBP analysis`)
+            issues.push(`#${playOrder} Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Pitcher ${pitcherCurrent?.name} got ${earnedRunsScored} ER, but should be credited ${p.earnedRuns} ER based on the PBP analysis`)
           }
         }
 
         if (erIssues === 1) {
           for (const r of runners.filter(r => r.run && !r.earnedRun)) {
             if (r.scoredAfter3rdOpportunity) {
-              issues.push(`Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Runner ${r.runner} scored after 3rd opportunity, the run should be UNEARNED`)
+              issues.push(`#${playOrder} Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Runner ${r.runner} scored after 3rd opportunity, the run should be UNEARNED`)
             }
             if (r.reachedOnError) {
-              issues.push(`Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Runner ${r.runner} reached on error and scored, the run should be UNEARNED`)
+              issues.push(`#${playOrder} Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Runner ${r.runner} reached on error and scored, the run should be UNEARNED`)
             }
             if (r.tiebreak) {
-              issues.push(`Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Runner ${r.runner} scored as a tiebreaker runner, the run should be UNEARNED`)
+              issues.push(`#${playOrder} Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Runner ${r.runner} scored as a tiebreaker runner, the run should be UNEARNED`)
             }
           }
         } else if (erIssues === 2) {
           for (const r of runners.filter(r => r.run && r.earnedRun)) {
-            issues.push(`Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Runner ${r.runner} should be scored as earned`)
+            issues.push(`#${playOrder} Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Runner ${r.runner} should be scored as earned`)
           }
         }
 
