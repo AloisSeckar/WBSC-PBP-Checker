@@ -194,8 +194,15 @@ async function analyzeInvalidER(plays: WBSCGamePlay[], opts: { inn: number, top:
 
           const erBefore = pitcherBefore?.PITCHER || 0
           const erCurrent = pitcherCurrent?.PITCHER || 0
-          const earnedRunsScored = erCurrent - erBefore
+          let earnedRunsScored = erCurrent - erBefore
 
+          // for some situations, earned runs not appear until the next play (#8)
+          if (earnedRunsScored !== p.earnedRuns && (narrative.includes('scores on wild pitch') || narrative.includes('scores on passed ball'))) {
+            const pitcherNext = await getPitcherDetails(play.gameid, p.pitcher, playOrder + 1)
+            earnedRunsScored = (pitcherNext?.PITCHER || 0) - erBefore
+          }
+
+          // difference between PBP and our analysis => potential issue
           if (earnedRunsScored !== p.earnedRuns) {
             erIssues = earnedRunsScored > p.earnedRuns ? 1 : 2
             issues.push(`#${playOrder} Inning ${opts.inn} (${opts.top ? 'TOP' : 'BOT'}) - Pitcher ${pitcherCurrent?.name} got ${earnedRunsScored} ER, but should be credited ${p.earnedRuns} ER based on the PBP analysis`)
@@ -236,15 +243,20 @@ async function analyzeInvalidER(plays: WBSCGamePlay[], opts: { inn: number, top:
 }
 
 async function getPitcherDetails(gameId: number, pitcherId: number, playOrder: number): Promise<WBSCGamePlayDetailBoxScore | undefined> {
-  const playDetail = await $fetch<WBSCGamePlayDetail>(`https://s3-eu-west-1.amazonaws.com/game.wbsc.org/gamedata/${gameId}/play${playOrder}.json`)
+  try {
+    const playDetail = await $fetch<WBSCGamePlayDetail>(`https://s3-eu-west-1.amazonaws.com/game.wbsc.org/gamedata/${gameId}/play${playOrder}.json`)
 
-  let pitcher: WBSCGamePlayDetailBoxScore | undefined
-  for (const key of Object.keys(playDetail.boxscore)) {
-    const boxscore = playDetail.boxscore[key]!
-    if (parseInt(boxscore.playerid) === pitcherId && boxscore.PITCHER) {
-      pitcher = boxscore
+    let pitcher: WBSCGamePlayDetailBoxScore | undefined
+    for (const key of Object.keys(playDetail.boxscore)) {
+      const boxscore = playDetail.boxscore[key]!
+      if (parseInt(boxscore.playerid) === pitcherId && boxscore.PITCHER) {
+        pitcher = boxscore
+      }
     }
-  }
 
-  return pitcher
+    return pitcher
+  } catch (err) {
+    console.error((err as Error)?.message || 'unknown')
+    return undefined
+  }
 }
