@@ -96,8 +96,9 @@ async function analyzeInvalidER(plays: WBSCGamePlay[], opts: { inn: number, top:
       // look for batters reaching the base and add them as runners
       const batterPlay = narratives[0]!
       if (batterPlay.includes('singles') || batterPlay.includes('doubles') || batterPlay.includes('triples') || batterPlay.includes('homers') || batterPlay.includes('reaches') || batterPlay.includes('Hit By Pitch') || batterPlay.includes('walks') || batterPlay.includes('is intentionally walked')) {
+        const runnerName = batterPlay.match(/^(.*)\s+(singles|doubles|triples|homers|reaches|Hit By Pitch|walks|is intentionally walked)/)?.[1] || '???'
         const newRunner = {
-          runner: batterPlay.match(/^(.*)\s(singles|doubles|triples|homers|reaches|Hit By Pitch|walks|is intentionally walked)/)?.[1] || '???',
+          runner: runnerName.trim(),
           pitcher: play.pitcherid,
           reachedOnError: false,
           scoredAfter3rdOpportunity: false,
@@ -134,7 +135,7 @@ async function analyzeInvalidER(plays: WBSCGamePlay[], opts: { inn: number, top:
         // mark runners who scored during this play
         for (const n of narratives) {
           if (n.includes('scores') || n.includes('homers')) {
-            const scoringPlayer = n.match(/^(.*)\s(scores|homers)/)?.[1] || '???'
+            const scoringPlayer = n.match(/^(.*)\s+(scores|homers)/)?.[1] || '???'
 
             // try getting runner by name
             let runner = runners.find(r => scoringPlayer.includes(r.runner))
