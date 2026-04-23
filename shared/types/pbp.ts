@@ -6,7 +6,7 @@ export type PBPWinner = 'home' | 'away'
 
 export type PBPResult = 'OK' | 'ERR'
 
-export type PBPReportType = 'false-positive' | 'false-negative'
+export type PBPReportType = 'not-error' | 'not-ok'
 
 export type PBPGameCheckRequest = {
   gameLinks: string[]

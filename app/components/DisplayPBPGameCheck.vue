@@ -46,7 +46,7 @@ const reportType = useState<PBPReportType | undefined>('reportType')
 
 function report(link: string, result: PBPResult) {
   gameLink.value = link
-  reportType.value = result === 'OK' ? 'false-positive' : 'false-negative'
+  reportType.value = result === 'OK' ? 'not-ok' : 'not-error'
   return navigateTo('/report')
 }
 </script>

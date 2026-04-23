@@ -1,6 +1,6 @@
 // types for problem reporting
 
-export type ReportType = 'false-positive' | 'false-negative'
+export type ReportType = 'not-error' | 'not-ok'
 
 export type PBPReport = {
   gameLink: string

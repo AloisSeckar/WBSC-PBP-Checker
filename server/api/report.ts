@@ -10,7 +10,7 @@ export default defineEventHandler(async (event): Promise<PBPReportResponse> => {
   }
 
   // validate report type
-  if (!['false-positive', 'false-negative'].includes(body.reportType)) {
+  if (!['not-error', 'not-ok'].includes(body.reportType)) {
     return {
       success: false,
       error: 'Invalid report type.',
@@ -39,10 +39,10 @@ export default defineEventHandler(async (event): Promise<PBPReportResponse> => {
   }
 
   // map report type to GitHub label
-  const label = body.reportType === 'false-positive' ? 'false-positive' : 'false-negative'
+  const label = body.reportType === 'not-error' ? 'not-error' : 'not-ok'
 
   // build issue body
-  const issueBody = `**Game link:** ${body.gameLink}\n\n**Report type:** ${body.reportType === 'false-positive' ? 'False positive' : 'False negative'}\n\n**Description:**\n${body.description}`
+  const issueBody = `**Game link:** ${body.gameLink}\n\n**Report type:** ${body.reportType === 'not-error' ? 'Not ERR' : 'Not OK'}\n\n**Description:**\n${body.description}`
 
   try {
     const response = await $fetch<{ html_url: string }>('https://api.github.com/repos/AloisSeckar/WBSC-PBP-Checker/issues', {

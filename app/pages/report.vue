@@ -46,7 +46,7 @@ import type { FormSubmitEvent } from '@nuxt/ui'
 
 const schema = z.object({
   gameLink: z.string().url('Must be a valid URL').min(1, 'Game link is required'),
-  reportType: z.enum(['false-positive', 'false-negative'], {
+  reportType: z.enum(['not-error', 'not-ok'], {
     required_error: 'Please select a report type',
   }),
   issue: z.string().min(1, 'Issue summary is required'),
@@ -66,8 +66,8 @@ const state = reactive({
 })
 
 const reportTypeOptions = [
-  { value: 'false-positive', label: useNuxtApp().$i18n.t('report.falsePositive') },
-  { value: 'false-negative', label: useNuxtApp().$i18n.t('report.falseNegative') },
+  { value: 'not-error', label: useNuxtApp().$i18n.t('report.notError') },
+  { value: 'not-ok', label: useNuxtApp().$i18n.t('report.notOk') },
 ]
 
 const submitting = ref(false)
