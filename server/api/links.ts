@@ -9,7 +9,10 @@ export default defineEventHandler(async (event): Promise<string[]> => {
   let browser
   try {
     browser = await puppeteer.launch({
-      args: chromium.args,
+      args: [
+        ...chromium.args,
+        '--ignore-certificate-errors',
+      ],
       executablePath,
       headless: true,
     })
